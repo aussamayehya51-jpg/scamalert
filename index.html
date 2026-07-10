@@ -180,7 +180,9 @@
     ul.innerHTML = (r.reasons||[]).map(function(x){
       return '<li><span class="dot">•</span><span>'+esc(x)+'</span></li>';
     }).join('');
-    document.getElementById('todo').textContent = u.todo;
+    // The engine may carry advice specific to this exact case (e.g. a lone
+    // greeting); fall back to the generic advice for the level.
+    document.getElementById('todo').textContent = r.todo || u.todo;
 
     // Deep-check button: always available, but nudge it when offline is unsure
     var deepWrap = document.getElementById('deepWrap');
@@ -194,10 +196,11 @@
   }
 
   function headline(r){
-    if (r.type==='link')    return 'This link';
-    if (r.type==='phone')   return 'This phone number';
-    if (r.type==='sender')  return 'That’s just a sender name';
-    if (r.type==='message') return 'This message';
+    if (r.type==='link')     return 'This link';
+    if (r.type==='phone')    return 'This phone number';
+    if (r.type==='sender')   return 'That’s just a sender name';
+    if (r.type==='greeting') return 'A stranger’s “hello”';
+    if (r.type==='message')  return 'This message';
     return 'Check';
   }
   function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }

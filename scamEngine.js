@@ -211,6 +211,44 @@
     return { type: 'phone', score: score, level: score >= 25 ? 'warning' : 'unknown', reasons: reasons, deepCheck: true };
   }
 
+  // ---- The cold opener ----------------------------------------------------
+  // The most common scam opener on earth, and the hardest to see: a stranger
+  // sends one bare "hello". No link, nothing to click — that is exactly why it
+  // works. He is not chatting; he is finding out whether a real person holds
+  // this number. Everyone who answers gets moved to the next stage.
+  // Offline we cannot know if the sender is a friend, so we do not scream
+  // "scam" — we ask the one question that decides it: do you know this person?
+  var GREET_EN = /(^|\s)(hi+|hey+|hell?o+|good\s+(morning|evening|afternoon|day)|how\s+(are\s+you|r\s+u)|dear|friend|sir|madam|miss|wrong\s+number|is\s+this\s+(you|your\s+number)|salam|salaam|assalam|marhaba|kifak|kifik)(?=\s|$)/gi;
+  var GREET_AR = /(مرحبا|أهلا|اهلا|هلا|حياك|السلام عليكم|سلام|صباح الخير|مساء الخير|كيف حالك|كيفك|شلونك|عزيزي|عزيزتي)/g;
+
+  function normalizeGreeting(s) {
+    return String(s)
+      .replace(/[ً-ْـ]/g, '')          // Arabic diacritics + tatweel: مرحبًا -> مرحبا
+      .replace(/[^a-z؀-ۿ\s]/gi, ' ')        // drop emoji, punctuation, digits — keep letters
+      .replace(/\s+/g, ' ')
+      .trim().toLowerCase();
+  }
+
+  function isColdOpener(text) {
+    var t = normalizeGreeting(text);
+    if (!t) return false;
+    if (t.split(' ').length > 6) return false;        // a real sentence, not a lone greeting
+    var left = t.replace(GREET_EN, ' ').replace(GREET_AR, ' ').replace(/\s+/g, ' ').trim();
+    return left.length <= 2;                          // nothing but the greeting remains
+  }
+
+  function analyzeColdOpener() {
+    return {
+      type: 'greeting', score: 45, level: 'warning', deepCheck: true,
+      reasons: [
+        'This is only a greeting — no link, nothing to click. That is exactly why it works.',
+        'A stranger who sends a lone "hello" is not chatting. He is checking whether a real person holds this number. Everyone who answers is moved to the next step: a few friendly days, then an "investment", or an emergency that needs money.',
+        'If this person IS in your contacts, it is very likely just a friend saying hello.'
+      ],
+      todo: 'What to do: If you do not know this person — do NOT reply, not even "wrong number". Any answer proves your number is real and alive. Block them and delete the chat.'
+    };
+  }
+
   // ---- Type detection + main entry ---------------------------------------
   function detectType(s) {
     s = String(s).trim();
@@ -227,6 +265,11 @@
     var text = String(input == null ? '' : input);
     if (!text.trim()) return { type: 'empty', score: 0, level: 'unknown', reasons: ['Nothing to check yet.'], deepCheck: false };
     var trimmed = text.trim();
+
+    // Check for the lone greeting FIRST — otherwise "hello" / "مرحبًا" falls into
+    // the sender-name branch below and the app says nothing useful about the
+    // single most common scam opener there is.
+    if ((!hint || hint === 'auto') && isColdOpener(trimmed)) return analyzeColdOpener();
 
     // A lone word with letters, no dot, no long number = an SMS "sender name",
     // not a real message. We must NOT call it a scam (that would false-alarm on
