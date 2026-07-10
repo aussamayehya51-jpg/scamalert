@@ -193,8 +193,52 @@
   }
 
   // ---- Phone analysis (offline is limited — honest about it) --------------
+  // The phone's own country. A number from somewhere else is the first thing
+  // the app can read offline — and often the loudest signal.
+  var HOME_CC = '961'; // Lebanon
+  // Country code -> name, for the "aha, it's Cuba" moment.
+  var CC_NAME = {
+    '1':'the US/Canada','7':'Russia','20':'Egypt','27':'South Africa','30':'Greece','31':'the Netherlands',
+    '32':'Belgium','33':'France','34':'Spain','36':'Hungary','39':'Italy','40':'Romania','41':'Switzerland',
+    '43':'Austria','44':'the UK','45':'Denmark','46':'Sweden','47':'Norway','48':'Poland','49':'Germany',
+    '51':'Peru','52':'Mexico','53':'Cuba','54':'Argentina','55':'Brazil','56':'Chile','57':'Colombia','58':'Venezuela',
+    '60':'Malaysia','61':'Australia','62':'Indonesia','63':'the Philippines','64':'New Zealand','65':'Singapore',
+    '66':'Thailand','81':'Japan','82':'South Korea','84':'Vietnam','86':'China','90':'Turkey','91':'India',
+    '92':'Pakistan','93':'Afghanistan','94':'Sri Lanka','95':'Myanmar','98':'Iran',
+    '211':'South Sudan','212':'Morocco','213':'Algeria','216':'Tunisia','218':'Libya','220':'Gambia','221':'Senegal',
+    '223':'Mali','225':'Ivory Coast','226':'Burkina Faso','229':'Benin','231':'Liberia','233':'Ghana','234':'Nigeria',
+    '237':'Cameroon','243':'DR Congo','249':'Sudan','251':'Ethiopia','252':'Somalia','254':'Kenya','255':'Tanzania',
+    '256':'Uganda','260':'Zambia','263':'Zimbabwe','351':'Portugal','352':'Luxembourg','353':'Ireland','355':'Albania',
+    '357':'Cyprus','358':'Finland','359':'Bulgaria','370':'Lithuania','371':'Latvia','372':'Estonia','373':'Moldova',
+    '374':'Armenia','375':'Belarus','380':'Ukraine','381':'Serbia','383':'Kosovo','385':'Croatia','386':'Slovenia',
+    '387':'Bosnia','389':'North Macedonia','420':'Czechia','421':'Slovakia','852':'Hong Kong','855':'Cambodia',
+    '856':'Laos','880':'Bangladesh','886':'Taiwan','960':'the Maldives','961':'Lebanon','962':'Jordan','963':'Syria',
+    '964':'Iraq','965':'Kuwait','966':'Saudi Arabia','967':'Yemen','968':'Oman','970':'Palestine','971':'the UAE',
+    '972':'Israel','973':'Bahrain','974':'Qatar','976':'Mongolia','977':'Nepal','992':'Tajikistan','993':'Turkmenistan',
+    '994':'Azerbaijan','995':'Georgia','996':'Kyrgyzstan','998':'Uzbekistan',
+    '870':'a satellite phone','881':'a satellite phone','882':'an international network','883':'an international network'
+  };
+  // Countries a Lebanese person plausibly has family/work ties to → gentler tone.
+  var FAMILIAR_CC = {'971':1,'966':1,'974':1,'965':1,'973':1,'968':1,'967':1,'20':1,'963':1,'962':1,'964':1,
+    '970':1,'972':1,'90':1,'98':1,'1':1,'44':1,'33':1,'49':1,'39':1,'46':1,'45':1,'31':1,'32':1,'41':1,'34':1,
+    '61':1,'55':1,'234':1,'225':1,'233':1,'351':1,'357':1,'358':1,'46':1,'47':1};
+
+  // Reads the country code off an international number (+CC… or 00CC…).
+  function readCountry(s) {
+    var d = String(s).replace(/[^\d+]/g, '');
+    var rest;
+    if (d.charAt(0) === '+') rest = d.slice(1);
+    else if (d.slice(0, 2) === '00') rest = d.slice(2);
+    else return { intl: false };
+    for (var len = 3; len >= 1; len--) {
+      var cc = rest.slice(0, len);
+      if (CC_NAME[cc]) return { intl: true, cc: cc, name: CC_NAME[cc] };
+    }
+    return { intl: true, cc: null, name: null };
+  }
+
   function analyzePhone(raw) {
-    var reasons = [], score = 0;
+    var reasons = [], score = 0, todo = null;
     var s = String(raw).trim();
     var letters = (s.match(/[a-zء-ي]/gi) || []).length;
     var digits = (s.match(/\d/g) || []).length;
@@ -207,8 +251,29 @@
       score += 15;
       reasons.push('Very short number (a "short code") — used for both real services and scams.');
     }
-    reasons.push('Offline, I can’t look up a phone number. Tap "Deep check" to look it up online, or just don’t answer unknown numbers.');
-    return { type: 'phone', score: score, level: score >= 25 ? 'warning' : 'unknown', reasons: reasons, deepCheck: true };
+
+    // The big offline signal: where is this number from?
+    var geo = readCountry(s);
+    if (geo.intl && geo.cc !== HOME_CC) {
+      if (geo.name && !FAMILIAR_CC[geo.cc]) {
+        score += 35;
+        reasons.push('This number is from ' + geo.name + ' — a country you most likely have no ties to.');
+        reasons.push('A call, or a one-ring "missed call", from a far country is a classic trap: you call back and it is a paid line that charges you by the minute — and some of that money goes to the scammer.');
+        todo = 'What to do: Do NOT call back and do NOT save it. If you do not know anyone in ' + geo.name + ', block the number. Let a real caller leave a message.';
+      } else if (geo.name) {
+        score += 15;
+        reasons.push('This number is from ' + geo.name + '. If you know someone there it may be fine — but if you do NOT, be careful and never call back an unknown foreign number.');
+      } else {
+        score += 30;
+        reasons.push('This is an international number from outside Lebanon. If you were not expecting a foreign call, a "call-back" trap charges you premium rates when you return the call.');
+        todo = 'What to do: Don’t call back an unknown foreign number. If it matters, they will message or leave a voicemail.';
+      }
+    }
+
+    reasons.push('Offline, I can’t look up who owns a number. For a deeper look tap the AI — or simply don’t answer numbers you don’t know.');
+    var result = { type: 'phone', score: score, level: score >= 25 ? 'warning' : 'unknown', reasons: reasons, deepCheck: true };
+    if (todo) result.todo = todo;
+    return result;
   }
 
   // ---- The cold opener ----------------------------------------------------
