@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a1220" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<title>Learn the signs — ScamAlert</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    background:radial-gradient(120% 80% at 50% 0%,#0e1b30 0%,#0a1220 55%,#070d18 100%);
+    color:#e6eef8;min-height:100vh;padding:18px 16px 44px}
+  .wrap{max-width:560px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .back{color:#8fd7ff;text-decoration:none;font-size:14px;font-weight:600}
+  .lang{background:#13233d;color:#8fd7ff;border:1px solid #23406a;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  h1{font-size:22px;margin:6px 0 4px}
+  .sub{color:#7f96b3;font-size:13.5px;line-height:1.6;margin-bottom:18px}
+  .sign{background:linear-gradient(160deg,#101f36,#0c1728);border:1px solid #1c2c48;border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+  .num{flex:0 0 auto;width:28px;height:28px;border-radius:999px;background:linear-gradient(90deg,#00d6a4,#00b4d8);color:#04121a;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .sign h3{margin:2px 0 5px;font-size:15px;color:#eaf2ff}
+  .sign p{margin:0;font-size:13.5px;line-height:1.6;color:#a9bdd6}
+  .gold{background:linear-gradient(160deg,#2a2109,#1e1808);border:1px solid #ffb020;border-radius:14px;padding:14px 16px;margin:18px 0}
+  .gold h2{margin:0 0 8px;font-size:16px;color:#ffcf6b}
+  .gold ul{margin:0;padding-left:20px}
+  .gold li{font-size:13.5px;line-height:1.75;color:#ffe9bf}
+  .red{background:linear-gradient(160deg,#2a0d13,#1e0a10);border:1px solid #ff4a5e;border-radius:14px;padding:14px 16px;margin:14px 0}
+  .red h2{margin:0 0 8px;font-size:16px;color:#ff8a97}
+  .red p{margin:5px 0;font-size:13.5px;line-height:1.65;color:#ffd7db}
+  footer{text-align:center;color:#54688a;font-size:11.5px;margin-top:24px;line-height:1.7}
+  [dir="rtl"] .sign{text-align:right}
+  [dir="rtl"] .gold ul{padding-left:0;padding-right:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html" id="back">← Back to check</a>
+    <button class="lang" id="langBtn" type="button">العربية</button>
+  </div>
+
+  <h1 id="title">🛡 Learn the 7 signs of a scam</h1>
+  <p class="sub" id="sub">A scammer needs you to feel rushed, special, or afraid. Learn these seven signs once, and you will spot almost every scam before it costs you anything.</p>
+
+  <div id="signs"></div>
+
+  <div class="gold">
+    <h2 id="goldTitle">⭐ The golden rules</h2>
+    <ul id="goldList"></ul>
+  </div>
+
+  <div class="red">
+    <h2 id="redTitle">If it already happened to you</h2>
+    <p id="redBody"></p>
+  </div>
+
+  <footer>
+    ScamAlert · OUS Software · Powered by Claude 🤖
+  </footer>
+</div>
+
+<script>
+(function(){
+  var DATA = {
+    en: {
+      dir:'ltr', lang:'en', btn:'العربية', back:'← Back to check',
+      title:'🛡 Learn the 7 signs of a scam',
+      sub:'A scammer needs you to feel rushed, special, or afraid. Learn these seven signs once, and you will spot almost every scam before it costs you anything.',
+      signs:[
+        ['They rush you','"Within 24 hours", "immediately", "your account will be closed". Real banks and real companies give you time. Speed is the scammer’s weapon — it stops you from thinking.'],
+        ['They ask for a code','No bank, no company, no delivery service will ever ask for the code sent to your phone (OTP). Anyone asking for that code is trying to enter your account. Never share it. Not with anyone.'],
+        ['You must pay to receive','You "won" a prize, an inheritance, a package — but first send a small fee. Real prizes never ask you to pay first. This is the oldest scam in the world.'],
+        ['The link is almost right','whish-money.top instead of whish.money. One letter, one ending, one extra word — and it is a different website that steals what you type. Always look at the address carefully.'],
+        ['A stranger who loves you fast','Romance, friendship, or a "wrong number" that turns warm very quickly — then investment advice or an emergency needing money. Real love does not arrive with a wallet.'],
+        ['A deal too good to be true','An iPhone at a third of the price, a job paying thousands for easy work, an investment with guaranteed profit. If it were real, they would not need to find you.'],
+        ['They want to move you somewhere else','From Facebook to WhatsApp, from the app to Telegram. They pull you to a place with no protection and no record. Real business stays where it started.']
+      ],
+      goldTitle:'⭐ The golden rules',
+      gold:[
+        'Never share the code from your phone. Never. Not even with "the bank".',
+        'If they rush you, stop. Rushing is the scam.',
+        'Never pay a fee to receive money, a prize, or a job.',
+        'Check the link letter by letter — or paste it into ScamAlert.',
+        'When unsure, tell someone you trust before you send anything.',
+        'Feeling embarrassed helps only the scammer. Speak up early.'
+      ],
+      redTitle:'If it already happened to you',
+      redBody:'You are not stupid — these people do this all day, every day, and they are good at it. Act fast: call your bank and freeze the card or account. Change the password of anything connected. Keep the messages as evidence — do not delete them. In Lebanon you can report cybercrime to the ISF at 1787. And tell your family, so they are not next.'
+    },
+    ar: {
+      dir:'rtl', lang:'ar', btn:'English', back:'→ العودة للفحص',
+      title:'🛡 تعلّم العلامات السبع للاحتيال',
+      sub:'المحتال يحتاج أن تشعر بالاستعجال أو أنك مميّز أو خائف. تعلّم هذه العلامات السبع مرّة واحدة، وستكتشف معظم عمليات الاحتيال قبل أن تخسر شيئاً.',
+      signs:[
+        ['يستعجلونك','«خلال ٢٤ ساعة»، «فوراً»، «سيتم إغلاق حسابك». البنوك والشركات الحقيقية تعطيك وقتاً. السرعة هي سلاح المحتال — تمنعك من التفكير.'],
+        ['يطلبون الرمز','لا بنك ولا شركة ولا شركة توصيل تطلب أبداً الرمز الذي يصل إلى هاتفك (OTP). من يطلب هذا الرمز يحاول الدخول إلى حسابك. لا تشاركه أبداً. مع أي أحد.'],
+        ['يجب أن تدفع لتستلم','«ربحت» جائزة أو إرثاً أو طرداً — لكن ادفع رسماً صغيراً أولاً. الجوائز الحقيقية لا تطلب منك الدفع أولاً. هذه أقدم حيلة في العالم.'],
+        ['الرابط شبه صحيح','whish-money.top بدل whish.money. حرف واحد أو نهاية مختلفة أو كلمة زائدة — ويصبح موقعاً آخر يسرق ما تكتبه. انظر إلى العنوان بدقة دائماً.'],
+        ['غريب يحبّك بسرعة','حبّ أو صداقة أو «رقم خطأ» يتحوّل إلى دفء سريع — ثم نصيحة استثمار أو طارئ يحتاج مالاً. الحبّ الحقيقي لا يأتي ومعه محفظة.'],
+        ['عرض أجمل من أن يكون حقيقياً','آيفون بثلث السعر، وظيفة تدفع آلافاً مقابل عمل سهل، استثمار بربح مضمون. لو كان حقيقياً لما احتاجوا للبحث عنك.'],
+        ['يريدون نقلك إلى مكان آخر','من فيسبوك إلى واتساب، من التطبيق إلى تلغرام. يسحبونك إلى مكان بلا حماية وبلا سجلّ. العمل الحقيقي يبقى حيث بدأ.']
+      ],
+      goldTitle:'⭐ القواعد الذهبية',
+      gold:[
+        'لا تشارك أبداً الرمز الذي يصل إلى هاتفك. أبداً. ولا حتى مع «البنك».',
+        'إذا استعجلوك، توقّف. الاستعجال نفسه هو الاحتيال.',
+        'لا تدفع أبداً رسماً لتستلم مالاً أو جائزة أو وظيفة.',
+        'افحص الرابط حرفاً حرفاً — أو الصقه في ScamAlert.',
+        'عند الشك، أخبر شخصاً تثق به قبل أن ترسل أي شيء.',
+        'الخجل يساعد المحتال وحده. تكلّم باكراً.'
+      ],
+      redTitle:'إذا حصل معك الأمر فعلاً',
+      redBody:'أنت لست غبياً — هؤلاء يفعلون هذا طوال اليوم وكل يوم، وهم بارعون فيه. تصرّف بسرعة: اتصل بالبنك وجمّد البطاقة أو الحساب. غيّر كلمة السر لكل ما هو مرتبط. احتفظ بالرسائل كدليل — لا تحذفها. في لبنان يمكنك الإبلاغ عن الجرائم الإلكترونية لدى قوى الأمن الداخلي على الرقم 1787. وأخبر عائلتك، حتى لا يكونوا الضحية التالية.'
+    }
+  };
+
+  function render(code){
+    var d = DATA[code];
+    document.documentElement.setAttribute('dir', d.dir);
+    document.documentElement.setAttribute('lang', d.lang);
+    document.getElementById('langBtn').textContent = d.btn;
+    document.getElementById('back').textContent = d.back;
+    document.getElementById('title').textContent = d.title;
+    document.getElementById('sub').textContent = d.sub;
+    document.getElementById('goldTitle').textContent = d.goldTitle;
+    document.getElementById('redTitle').textContent = d.redTitle;
+    document.getElementById('redBody').textContent = d.redBody;
+
+    document.getElementById('signs').innerHTML = d.signs.map(function(s, i){
+      return '<div class="sign"><div class="num">' + (i+1) + '</div><div><h3></h3><p></p></div></div>';
+    }).join('');
+    var cards = document.querySelectorAll('#signs .sign');
+    for (var i = 0; i < cards.length; i++){
+      cards[i].querySelector('h3').textContent = d.signs[i][0];
+      cards[i].querySelector('p').textContent  = d.signs[i][1];
+    }
+
+    document.getElementById('goldList').innerHTML = d.gold.map(function(){ return '<li></li>'; }).join('');
+    var lis = document.querySelectorAll('#goldList li');
+    for (var j = 0; j < lis.length; j++) lis[j].textContent = d.gold[j];
+
+    try { localStorage.setItem('sa_learn_lang', code); } catch(e){}
+  }
+
+  var start = 'en';
+  try { start = localStorage.getItem('sa_learn_lang') || 'en'; } catch(e){}
+  render(DATA[start] ? start : 'en');
+
+  document.getElementById('langBtn').onclick = function(){
+    render(document.documentElement.getAttribute('lang') === 'ar' ? 'en' : 'ar');
+  };
+})();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>

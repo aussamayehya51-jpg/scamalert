@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="theme-color" content="#0a1220" />
+<meta name="description" content="Check any message, link, or phone number for scams — instantly, right on your phone. Works offline." />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="ScamAlert" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="ScamAlert — Check before you trust" />
+<meta property="og:description" content="Paste any message, link, or phone number and know in a second if it is a scam. Free, no signup, works offline on your phone." />
+<meta property="og:url" content="https://aussamayehya51-jpg.github.io/scamalert/" />
+<meta property="og:image" content="https://aussamayehya51-jpg.github.io/scamalert/demo-og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<title>ScamAlert — Check before you trust</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    background:radial-gradient(120% 80% at 50% 0%,#0e1b30 0%,#0a1220 55%,#070d18 100%);
+    color:#e6eef8;min-height:100vh;padding:18px 16px 40px;
+  }
+  .wrap{max-width:520px;margin:0 auto}
+  header{text-align:center;margin:8px 0 18px}
+  .logo{font-size:26px;font-weight:800;letter-spacing:.3px}
+  .logo .shield{color:#00e0b8}
+  .tag{color:#7f96b3;font-size:13px;margin-top:4px}
+  .powered{color:#5b6f8c;font-size:11px;margin-top:6px}
+
+  .panel{background:linear-gradient(160deg,#101f36,#0c1728);border:1px solid #1c2c48;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  label.q{display:block;font-size:13.5px;color:#9fb4d1;margin:2px 2px 8px}
+  textarea{
+    width:100%;min-height:120px;resize:vertical;border-radius:12px;
+    background:#08111f;border:1px solid #21324f;color:#eaf2ff;
+    padding:13px 14px;font-size:15px;line-height:1.5;font-family:inherit;
+  }
+  textarea::placeholder{color:#5c718d}
+  .row{display:flex;gap:10px;margin-top:12px}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-weight:700;transition:transform .06s,filter .15s}
+  button:active{transform:translateY(1px)}
+  .btn-paste{flex:0 0 auto;background:#13233d;color:#8fd7ff;border:1px solid #23406a;padding:0 16px;font-size:14px}
+  .btn-check{flex:1;background:linear-gradient(90deg,#00d6a4,#00b4d8);color:#04121a;font-size:16px;padding:14px}
+  .btn-check:hover{filter:brightness(1.06)}
+
+  .hint{color:#6f86a4;font-size:12px;margin:12px 2px 0;text-align:center;line-height:1.6}
+
+  /* Result card */
+  .result{margin-top:16px;border-radius:16px;padding:16px;display:none;animation:pop .25s ease-out}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .result.show{display:block}
+  .verdict{display:flex;align-items:center;gap:12px}
+  .vicon{font-size:38px;line-height:1}
+  .vtext .band{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  .vtext .head{font-size:18px;font-weight:800;margin-top:2px}
+  .reasons{margin:14px 0 0;padding:0;list-style:none}
+  .reasons li{display:flex;gap:9px;align-items:flex-start;padding:7px 0;font-size:13.5px;line-height:1.55;color:#dbe6f4;border-top:1px solid rgba(255,255,255,.06)}
+  .reasons li:first-child{border-top:none}
+  .reasons li .dot{margin-top:2px;flex:0 0 auto}
+  .todo{margin-top:14px;padding:12px 14px;border-radius:11px;font-size:13.5px;line-height:1.6;font-weight:600}
+
+  /* Severity palettes */
+  .danger{background:linear-gradient(160deg,#2a0d13,#1e0a10);border:1px solid #ff4a5e}
+  .danger .band{color:#ff8a97}   .danger .head{color:#fff}   .danger .todo{background:#3a0e16;color:#ffd7db;border:1px solid #ff4a5e}
+  .warning{background:linear-gradient(160deg,#2a2109,#1e1808);border:1px solid #ffb020}
+  .warning .band{color:#ffcf6b} .warning .head{color:#fff}  .warning .todo{background:#33280b;color:#ffe9bf;border:1px solid #ffb020}
+  .safe{background:linear-gradient(160deg,#0a2620,#08201b);border:1px solid #17b98a}
+  .safe .band{color:#57e0b4}    .safe .head{color:#eafff8}   .safe .todo{background:#0c2c24;color:#c9f5e7;border:1px solid #17b98a}
+  .unknown{background:linear-gradient(160deg,#141f30,#101828);border:1px solid #3a557f}
+  .unknown .band{color:#8fb2dd} .unknown .head{color:#eaf2ff} .unknown .todo{background:#132135;color:#cfe0f4;border:1px solid #3a557f}
+
+  .deep{margin-top:14px}
+  .btn-deep{width:100%;background:#101d33;color:#8fd7ff;border:1px solid #2a466f;padding:12px;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-deep:hover{filter:brightness(1.1)}
+  .deep-note{color:#6f86a4;font-size:11.5px;text-align:center;margin-top:7px;line-height:1.5}
+  .deep-out{margin-top:12px;font-size:13.5px;line-height:1.6;color:#dbe6f4}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid #2a466f;border-top-color:#8fd7ff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .btn-share{width:100%;margin-top:12px;background:#123626;color:#7dffb0;border:1px solid #1f6b45;padding:12px;font-size:14px}
+  footer{text-align:center;color:#54688a;font-size:11.5px;margin-top:22px;line-height:1.7}
+  footer a{color:#7fb2e5;text-decoration:none}
+
+  /* QR scanner */
+  .btn-scan{width:100%;margin-top:10px;background:#0f2438;color:#8fd7ff;border:1px solid #23406a;padding:12px;font-size:14px}
+  #cam{display:none;width:100%;border-radius:12px;margin-top:10px;border:1px solid #23406a;background:#000}
+  #cam.on{display:block}
+  .scan-msg{display:none;color:#ffcf6b;font-size:12px;text-align:center;margin-top:8px;line-height:1.6}
+  .scan-msg.on{display:block}
+
+  /* Install to home screen */
+  .install{display:none;align-items:center;gap:10px;justify-content:space-between;background:#10233c;border:1px solid #2a466f;border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:#cfe0f4}
+  .install.on{display:flex}
+  .install button{background:linear-gradient(90deg,#00d6a4,#00b4d8);color:#04121a;padding:8px 14px;font-size:13px}
+  .install .x{background:none;color:#6f86a4;font-size:18px;padding:0 4px;font-weight:400}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="shield">🛡</span> ScamAlert</div>
+    <div class="tag">Paste anything suspicious — I check it in a second, right here on your phone.</div>
+    <div class="powered">Works offline · Nothing leaves your phone · Powered by Claude 🤖</div>
+  </header>
+
+  <div class="install" id="installBar">
+    <span id="installText">📲 Add ScamAlert to your home screen</span>
+    <span><button id="installBtn" type="button">Install</button><button class="x" id="installX" type="button">✕</button></span>
+  </div>
+
+  <div class="panel">
+    <label class="q" for="inp">Paste a message, a link, or a phone number:</label>
+    <textarea id="inp" placeholder="e.g.  Congratulations! You won $5000, click http://claim-now.xyz to receive it…"></textarea>
+    <div class="row">
+      <button class="btn-paste" id="pasteBtn" type="button">📋 Paste</button>
+      <button class="btn-check" id="checkBtn" type="button">Check now</button>
+    </div>
+    <button class="btn-scan" id="scanBtn" type="button">📷 Scan a QR code</button>
+    <video id="cam" playsinline muted></video>
+    <div class="scan-msg" id="scanMsg"></div>
+    <div class="hint">Layer 1 runs instantly &amp; privately on your phone. If it’s unsure, you can ask the online AI for a deeper look.</div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="verdict">
+      <div class="vicon" id="vicon">🛡</div>
+      <div class="vtext"><div class="band" id="vband"></div><div class="head" id="vhead"></div></div>
+    </div>
+    <ul class="reasons" id="reasons"></ul>
+    <div class="todo" id="todo"></div>
+
+    <div class="deep" id="deepWrap">
+      <button class="btn-deep" id="deepBtn" type="button">🤖 Get a second opinion from the AI</button>
+      <div class="deep-note">This sends only this text to our AI for a closer look. Your choice, every time.</div>
+      <div class="deep-out" id="deepOut"></div>
+    </div>
+
+    <button class="btn-share" id="shareBtn" type="button">📲 Warn my family on WhatsApp</button>
+  </div>
+
+  <footer>
+    <a href="learn.html">📖 Learn the 7 signs of a scam</a><br><br>
+    ScamAlert · OUS Software · Powered by Claude 🤖<br>
+    No account needed. We never see your messages unless you tap “second opinion”.
+  </footer>
+</div>
+
+<script src="scamEngine.js"></script>
+<script>
+(function(){
+  var inp = document.getElementById('inp');
+  var result = document.getElementById('result');
+  var lastText = '', lastResult = null;
+
+  var UI = {
+    danger:  { icon:'⛔', band:'Danger — very likely a scam', todo:'What to do: Do NOT reply, click, pay, or share any code. Delete it. If it pretends to be your bank, call the bank using the number on your card.' },
+    warning: { icon:'⚠️', band:'Be careful — suspicious',      todo:'What to do: Treat this with caution. Don’t click links or share codes until you are sure. When unsure, ask the AI below.' },
+    safe:    { icon:'✅', band:'No obvious scam signs',         todo:'Looks clean — but no tool is perfect. Never send money or codes to someone you don’t know, even if a message looks fine.' },
+    unknown: { icon:'🛡', band:'Need more to judge',           todo:'Paste the full message, or tap the AI for a closer look.' }
+  };
+
+  function render(r){
+    lastResult = r;
+    var lvl = (r.level && UI[r.level]) ? r.level : 'unknown';
+    var u = UI[lvl];
+    result.className = 'result show ' + lvl;
+    document.getElementById('vicon').textContent = u.icon;
+    document.getElementById('vband').textContent = u.band;
+    document.getElementById('vhead').textContent = headline(r);
+    var ul = document.getElementById('reasons');
+    ul.innerHTML = (r.reasons||[]).map(function(x){
+      return '<li><span class="dot">•</span><span>'+esc(x)+'</span></li>';
+    }).join('');
+    document.getElementById('todo').textContent = u.todo;
+
+    // Deep-check button: always available, but nudge it when offline is unsure
+    var deepWrap = document.getElementById('deepWrap');
+    deepWrap.style.display = (r.type === 'empty') ? 'none' : 'block';
+    document.getElementById('deepOut').innerHTML = '';
+
+    // Share button only when there IS a real warning to spread
+    document.getElementById('shareBtn').style.display = (lvl==='danger'||lvl==='warning') ? 'block' : 'none';
+
+    result.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function headline(r){
+    if (r.type==='link')    return 'This link';
+    if (r.type==='phone')   return 'This phone number';
+    if (r.type==='sender')  return 'That’s just a sender name';
+    if (r.type==='message') return 'This message';
+    return 'Check';
+  }
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+
+  function doCheck(){
+    var t = inp.value.trim();
+    if (!t){ inp.focus(); return; }
+    lastText = t;
+    render(window.ScamEngine.analyze(t));
+  }
+
+  document.getElementById('checkBtn').onclick = doCheck;
+  inp.addEventListener('keydown', function(e){ if((e.ctrlKey||e.metaKey) && e.key==='Enter') doCheck(); });
+
+  document.getElementById('pasteBtn').onclick = function(){
+    if (navigator.clipboard && navigator.clipboard.readText){
+      navigator.clipboard.readText().then(function(txt){
+        if (txt){ inp.value = txt; doCheck(); }
+      }).catch(function(){ inp.focus(); });
+    } else { inp.focus(); }
+  };
+
+  // Layer 2 — online AI second opinion (best-effort; graceful if server absent)
+  document.getElementById('deepBtn').onclick = function(){
+    var out = document.getElementById('deepOut');
+    out.innerHTML = '<span class="spin"></span> Asking the AI…';
+    // Relative by default, so it works whether the app is served from a domain
+    // root or a subfolder (GitHub Pages). When the app is hosted as static files
+    // with no backend, set window.SCAMALERT_API to the backend's URL.
+    var base = (window.SCAMALERT_API || '').replace(/\/+$/, '');
+    var endpoint = base ? base + '/api/public/deep-check' : 'api/public/deep-check';
+    fetch(endpoint, {
+      method:'POST', headers:{'Content-Type':'application/json; charset=utf-8'},
+      body: JSON.stringify({ text: lastText })
+    }).then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(d){
+        out.innerHTML = '<strong style="color:#8fd7ff">🤖 AI second opinion:</strong><br>' + esc(d.summary || d.verdict || 'No clear answer.');
+      })
+      .catch(function(){
+        out.innerHTML = '<span style="color:#ffcf6b">The online AI isn’t reachable right now.</span> Your offline check above still stands — when in doubt, don’t click or pay.';
+      });
+  };
+
+  // ---- QR / link catcher --------------------------------------------------
+  // Scammers hide links behind QR codes (fake parking meters, fake payment
+  // posters). We decode the QR on-device and run it straight through Layer 1.
+  var camEl = document.getElementById('cam');
+  var scanMsg = document.getElementById('scanMsg');
+  var scanBtn = document.getElementById('scanBtn');
+  var scanning = false, stream = null, detector = null, qrCanvas = null, useJsQR = false;
+
+  function stopScan(){
+    scanning = false;
+    camEl.classList.remove('on');
+    if (stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
+    scanBtn.textContent = '📷 Scan a QR code';
+  }
+  function say(msg){ scanMsg.className = 'scan-msg on'; scanMsg.textContent = msg; }
+
+  // Chrome/Android has a built-in QR reader (BarcodeDetector). Safari/iPhone
+  // does not — so there we lazily pull in jsQR. It's 250KB, so it is only
+  // fetched the first time an iPhone user actually taps Scan.
+  function loadJsQR(){
+    return new Promise(function(resolve, reject){
+      if (window.jsQR) return resolve();
+      var s = document.createElement('script');
+      s.src = 'jsqr.min.js';
+      s.onload  = function(){ window.jsQR ? resolve() : reject(new Error('reader')); };
+      s.onerror = function(){ reject(new Error('reader')); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function startCamera(){
+    return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function(s){
+      stream = s; camEl.srcObject = s; camEl.play();
+      camEl.classList.add('on'); scanning = true;
+      scanBtn.textContent = '✕ Stop scanning';
+      requestAnimationFrame(tick);
+    });
+  }
+
+  scanBtn.onclick = function(){
+    if (scanning){ stopScan(); return; }
+    scanMsg.className = 'scan-msg'; scanMsg.textContent = '';
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia)
+      return say('No camera available on this device.');
+
+    var ready;
+    if ('BarcodeDetector' in window){
+      try { detector = detector || new window.BarcodeDetector({ formats: ['qr_code'] }); useJsQR = false; ready = Promise.resolve(); }
+      catch(e){ useJsQR = true; ready = loadJsQR(); }
+    } else {
+      useJsQR = true; ready = loadJsQR();
+    }
+
+    ready.then(function(){
+      return startCamera().catch(function(){
+        say('Camera permission was refused. You can still paste the link above.');
+      });
+    }).catch(function(){
+      say('Could not open the QR reader here. Use your phone’s camera app on the QR code, copy the link it shows, then paste it above.');
+    });
+  };
+
+  // Returns the QR text if a code is in view, otherwise null.
+  function readFrame(){
+    if (!useJsQR)
+      return detector.detect(camEl).then(function(codes){
+        return (codes && codes.length && codes[0].rawValue) ? codes[0].rawValue : null;
+      });
+
+    return new Promise(function(resolve){
+      var w = camEl.videoWidth, h = camEl.videoHeight;
+      if (!w || !h) return resolve(null);
+      qrCanvas = qrCanvas || document.createElement('canvas');
+      qrCanvas.width = w; qrCanvas.height = h;
+      var ctx = qrCanvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(camEl, 0, 0, w, h);
+      var img  = ctx.getImageData(0, 0, w, h);
+      var code = window.jsQR(img.data, w, h, { inversionAttempts: 'dontInvert' });
+      resolve(code && code.data ? code.data : null);
+    });
+  }
+
+  function tick(){
+    if (!scanning) return;
+    readFrame().then(function(val){
+      if (val){
+        stopScan();
+        inp.value = val;
+        doCheck();   // the scanned link goes straight into the offline engine
+        return;
+      }
+      requestAnimationFrame(tick);
+    }).catch(function(){ requestAnimationFrame(tick); });
+  }
+
+  // ---- Install to the home screen ----------------------------------------
+  var deferredPrompt = null;
+  var bar = document.getElementById('installBar');
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+  var dismissed = false;
+  try { dismissed = !!localStorage.getItem('sa_install_dismissed'); } catch(e){}
+
+  if (!standalone && !dismissed && isIOS){
+    document.getElementById('installText').textContent = '📲 Tap Share, then “Add to Home Screen”';
+    document.getElementById('installBtn').style.display = 'none';
+    bar.classList.add('on');
+  }
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferredPrompt = e;
+    if (!standalone && !dismissed) bar.classList.add('on');
+  });
+  document.getElementById('installBtn').onclick = function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; bar.classList.remove('on'); });
+  };
+  document.getElementById('installX').onclick = function(){
+    bar.classList.remove('on');
+    try { localStorage.setItem('sa_install_dismissed','1'); } catch(e){}
+  };
+
+  // Share a warning to family (WhatsApp), no personal data
+  document.getElementById('shareBtn').onclick = function(){
+    var lvl = lastResult ? lastResult.level : 'warning';
+    var v = lvl==='danger' ? '⛔ HIGH DANGER' : '⚠️ SUSPICIOUS';
+    var msg = '🛡 *ScamAlert warning*\n\nI just checked something and ScamAlert says: ' + v +
+      '.\n\nBe careful — don’t click links or send money/codes to strangers.\n\nCheck anything suspicious yourself with ScamAlert.';
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  };
+})();
+
+// Offline support: cache the app shell so Layer 1 protects you with no internet.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
