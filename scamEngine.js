@@ -37,7 +37,14 @@
       'verify your (account|identity|card|number|phone|info)', 'confirm your (password|account|payment|identity|card)',
       'update your (payment|card|billing|account|info)', 'enter your (pin|password|otp|code|cvv)',
       'share (the |your )?(code|otp|pin)', 'your otp', 'reactivate your account',
-      'login .{0,15}(verify|confirm|secure|unlock)', 'أدخل (الرمز|كلمة|الرقم السري)', 'رمز التحقق', 'أكّد (حسابك|هويتك)', 'حدّث (معلومات|بياناتك)'
+      'login .{0,15}(verify|confirm|secure|unlock)',
+      // Asking for the OTP by reply — the #1 bank scam, phrased many ways.
+      '(reply|respond|text|send|give|tell|forward) (me |us |back )?.{0,18}(\\d-?digit )?(code|otp|pin|password|cvv)',
+      '\\b\\d-?digit (code|pin|otp|number|password)',
+      '(verification|confirmation|security|one[- ]?time) code',
+      'the (code|otp|pin) .{0,18}(we|i|that|just) .{0,8}sent',
+      'أدخل (الرمز|كلمة|الرقم السري)', 'رمز التحقق', 'أكّد (حسابك|هويتك)', 'حدّث (معلومات|بياناتك)',
+      '(أرسل|ابعت|زودني|اعطني) .{0,12}(الرمز|الكود|كلمة السر|رمز التحقق)', 'ما هو (الرمز|الكود)'
     ]),
     payment: rx([
       // Scammers phrase the ask a hundred ways: "send $50", "send me 50 dollars",
@@ -60,7 +67,62 @@
     ]),
     threat: rx([
       'i (have|recorded|know your)', 'your (photos|videos|webcam|browsing history)',
-      'i will (send|share|expose|post|leak)', 'pay .{0,20}(bitcoin|btc)', 'i hacked (your|you)'
+      'i will (send|share|expose|post|leak)', 'pay .{0,20}(bitcoin|btc)', 'i hacked (your|you)',
+      'سج(ّ)?لت', 'اخترقت', 'صور(ك)? خاصة', 'سأنشر'
+    ]),
+    // Investment / pig-butchering — the slow-trust crypto trap. Requires the
+    // scammy SHAPE (guaranteed profit, crypto "opportunity"), not the bare word.
+    investment: rx([
+      'guaranteed (profit|return|income|money)', 'double your (money|investment|capital)',
+      '(crypto|bitcoin|forex|binary option|trading) (invest|profit|signal|platform|opportunity|group)',
+      'invest .{0,20}(crypto|bitcoin|forex|and (earn|profit)|guaranteed|small amount)',
+      'high (returns|profit)', 'profit (daily|every ?day|guaranteed|of \\d)',
+      'i (can|will) (teach|help|show) you (how )?(to )?(invest|trade|earn|make money)',
+      'financial freedom', '(signal|vip) group .{0,12}(profit|trade|crypto|invest)',
+      'استثمار (مضمون|مربح)', 'ربح مضمون', 'أرباح يومية', 'تداول', 'عمل(ة|ات) رقمية', 'ضاعف أموالك', 'محفظة استثمار'
+    ]),
+    // Task / job scams — "easy money from home", pay-to-unlock, commission bait.
+    task_job: rx([
+      '(work|job|earn) .{0,20}(from home|online).{0,20}(earn|\\$|salary|daily|money)',
+      'earn .{0,15}(\\$|\\d+).{0,18}(daily|per ?day|a day|from home|online|easy)',
+      '(rate|like|review|boost|optimize) (products|apps|hotels|videos|posts|orders) .{0,18}(earn|money|\\$|paid|commission)',
+      'part[- ]?time .{0,16}(online|remote|earn|\\$)', 'no experience (needed|required)',
+      'simple (task|job).{0,16}(earn|paid|\\$|daily)', 'commission (per|for each|on each) (task|order|like|referral)',
+      'complete .{0,10}tasks?.{0,18}(earn|get paid|\\$|commission)', '(unlock|vip) .{0,12}(task|level|set).{0,16}(deposit|pay|top ?up)',
+      'وظيفة (من المنزل|عن بعد)', 'اربح من المنزل', 'دخل (يومي|إضافي)', 'عمولة', 'مهام بسيطة', 'راتب يومي'
+    ]),
+    // Family-emergency / "new number" — impersonating your child/relative.
+    family_new_number: rx([
+      'this is my new number', 'i (lost|broke|changed|damaged) my phone', 'i (have|got) a new (number|phone|sim)',
+      'save (this as )?my new number', 'new whatsapp number', 'it(\'|’)?s me,? (mom|mum|dad|your son|your daughter)',
+      '(hi|hello|hey) (mom|mum|dad|mother|father)\\b', 'my (old )?(phone|number) (is|got|was) (broken|lost|stolen)',
+      'رقمي الجديد', 'ضاع (هاتفي|تلفوني|جوالي)', 'غيرت رقمي', 'رقم(ي)? جديد', 'أنا (ابنك|ابنتك|أمك|أبوك|ولدك)'
+    ]),
+    // Refund / tech-support — "you were charged", "call us", "install remote access".
+    refund_support: rx([
+      'refund (department|team|desk|of \\$|has been|is due|will be)', 'you (will|have) be(en)? (charged|billed) .{0,18}(renew|subscription|membership)',
+      'your (subscription|membership|antivirus|order|plan) (was|has been|is|will be) (renewed|charged|auto[- ]?renewed|debited)',
+      '(anydesk|teamviewer|remote ?desktop|remote access|screen ?share)', 'install .{0,18}(to (fix|refund|connect|verify)|our (app|tool|software))',
+      'call (us|this|our) .{0,12}(number|helpline|hotline|support|team)', '(tech|technical|customer) support .{0,15}(call|number|team)',
+      'your (computer|device|pc|account) (is|has been|was) (infected|hacked|compromised|at risk)',
+      'اتصل ب(الدعم|الرقم|فريق)', 'تم تجديد (اشتراك|عضوية)', 'استرداد (المبلغ|أموال)', 'دعم فني', 'جهازك (مصاب|مخترق)'
+    ]),
+    // Authority impersonation — police / court / tax threatening you. Low weight
+    // alone (mentions happen); the danger comes from the combo with pay/urgency.
+    authority: rx([
+      'arrest (warrant|you|is)', 'warrant .{0,12}(issued|out|for your)', 'legal action (will|against|taken)',
+      '(tax|irs|customs|immigration|social security|court|police|interpol|fbi) .{0,24}(you owe|owe|pay|fine|penalty|seized|on hold|detained|lawsuit)',
+      'you (owe|have (a )?(fine|penalty|unpaid)|must pay) .{0,18}(tax|fine|penalty|court|government|customs)',
+      'مذكرة (توقيف|اعتقال|قضائية)', 'مخالفة .{0,12}(دفع|سداد)', 'الجمارك .{0,15}(احتجاز|دفع|رسوم)', 'ضريبة .{0,12}(متأخرة|مستحقة)', 'ملاحقة قانونية'
+    ]),
+    // Untraceable payment rails — gift cards, crypto, wire. Near-universal scam
+    // tell: a REQUEST to pay this way (not just a mention).
+    untraceable_pay: rx([
+      '(pay|send|buy|purchase|load|get).{0,26}(gift ?card|itunes|google ?play card|steam card|amazon card|apple card|prepaid card)',
+      '(pay|send|transfer).{0,22}(in |with |via |by |through )?(bitcoin|btc|usdt|crypto|ethereum|binance)',
+      '(wire|western union|moneygram).{0,18}(transfer|money|the (fee|amount|money))',
+      'bitcoin (atm|wallet|address)', 'send (me )?(the )?(code|number|photo) (of|on|from) the (gift ?card)',
+      'ادفع .{0,15}(بطاقة|بيتكوين|كريبتو)', 'بطاقة (جوجل|جوجل بلاي|آيتونز|ايتونز|هدية|شحن)', '(عبر|من خلال) (ويسترن يونيون|بيتكوين)', 'محفظة بيتكوين'
     ])
   };
   var CAT_LABEL = {
@@ -69,9 +131,18 @@
     credential: 'Asking for your password, PIN or code',
     payment: 'Asking you to send money or a fee',
     impersonation: 'Pretending to be a bank / delivery / company',
-    threat: 'Threat or blackmail'
+    threat: 'Threat or blackmail',
+    investment: 'An "investment" promising guaranteed or fast profit',
+    task_job: 'Easy-money job bait ("earn from home / rate products")',
+    family_new_number: 'Someone claiming to be family from a "new number"',
+    refund_support: 'Fake refund / tech-support ("call this number / install this")',
+    authority: 'A "police / court / tax" threat demanding payment',
+    untraceable_pay: 'Asking to pay by gift card, crypto or wire (untraceable)'
   };
-  var CAT_WEIGHT = { urgency: 18, prize: 22, credential: 30, payment: 28, impersonation: 20, threat: 45 };
+  var CAT_WEIGHT = {
+    urgency: 18, prize: 22, credential: 30, payment: 28, impersonation: 20, threat: 45,
+    investment: 26, task_job: 26, family_new_number: 26, refund_support: 26, authority: 16, untraceable_pay: 30
+  };
 
   function levelFromScore(score) {
     if (score >= 60) return 'danger';
@@ -153,9 +224,48 @@
     return { type: 'link', score: score, level: levelFromScore(score), reasons: reasons };
   }
 
+  // ---- Name the scam + give the exact advice for its type -----------------
+  // Once we know which signals fired, we can tell the user WHAT kind of scam
+  // this is and the one right thing to do about it. Order = most specific /
+  // most dangerous first. `bonus` escalates when a tell-tale pair is present.
+  function classifyScam(h) {
+    var untr = !!h.untraceable_pay, pay = !!h.payment || untr;
+    if (h.threat)
+      return { name: 'a sextortion / blackmail scam', bonus: 0,
+        todo: 'What to do: Do NOT pay and do NOT reply. This is a bulk bluff sent to thousands — they almost never have anything. Paying only marks you as easy. Block and delete.' };
+    if (h.family_new_number)
+      return { name: 'a "family / new number" scam', bonus: pay ? 22 : 0,
+        todo: 'What to do: STOP — before you send anything, call the real person on their OLD number, or ask another relative. Scammers pose as your son, daughter or parent on a "new number" and invent an emergency. Real family will not mind you checking first.' };
+    if (h.investment)
+      return { name: 'an investment / "pig-butchering" scam', bonus: (untr || h.urgency) ? 16 : 0,
+        todo: 'What to do: No real investment guarantees profit. Never send money or crypto to someone who contacted you — however friendly or patient they were. If they say "don’t tell anyone", that alone proves it is a scam.' };
+    if (h.task_job)
+      return { name: 'a task / job scam', bonus: pay ? 18 : 0,
+        todo: 'What to do: A real job never asks you to pay, deposit, or "unlock" anything to get paid. The small early payment is the bait to make you trust it. Stop before you deposit a single lira.' };
+    if (h.authority)
+      return { name: 'an authority-impersonation scam ("police / court / tax")', bonus: (pay || h.urgency) ? 18 : 0,
+        todo: 'What to do: Real police, courts and tax offices never phone or text demanding payment by card, crypto or transfer, and never threaten instant arrest. Hang up. Call the real office yourself using an official number.' };
+    if (h.refund_support)
+      return { name: 'a refund / tech-support scam', bonus: (untr || h.credential) ? 15 : 0,
+        todo: 'What to do: No real company needs remote access to your device, and none pays refunds by gift card. Do not install anything, do not call the number, and never let anyone connect to your phone.' };
+    if (h.prize && pay)
+      return { name: 'a prize / advance-fee scam', bonus: 15,
+        todo: 'What to do: A real prize never asks you to pay first. Send nothing, and delete it.' };
+    if (h.urgency && h.credential)
+      return { name: 'a phishing scam', bonus: 15,
+        todo: 'What to do: Never type your password or the code from your phone into a link. Your bank will never ask for it. If unsure, open the app yourself — do not use their link.' };
+    if (h.impersonation && (h.urgency || h.credential || pay))
+      return { name: 'a fake-company / phishing message', bonus: 10,
+        todo: 'What to do: Do not tap the link or reply. Reach the company yourself — their app, or a number you already have — never through a link inside the message.' };
+    if (untr)
+      return { name: 'a scam (it wants an untraceable payment)', bonus: 10,
+        todo: 'What to do: Anyone asking to be paid by gift card, crypto or Western Union is almost always a scammer — those cannot be traced or refunded. Do not pay.' };
+    return null;
+  }
+
   // ---- Message analysis ---------------------------------------------------
   function analyzeMessage(text) {
-    var reasons = [], score = 0, hitCats = {};
+    var reasons = [], score = 0, hitCats = {}, todo = null;
     for (var k in CAT) {
       if (anyHit(CAT[k], text)) { hitCats[k] = true; score += CAT_WEIGHT[k]; reasons.push(CAT_LABEL[k]); }
     }
@@ -170,9 +280,13 @@
       if (pi !== -1) reasons[pi] = 'This mentions money. On its own that is normal — but never send money or a code to someone you do not know.';
     }
 
-    // Classic combos deserve a boost.
-    if (hitCats.urgency && hitCats.credential) { score += 15; reasons.push('Pressure + a request for your secret code = classic phishing.'); }
-    if (hitCats.prize && hitCats.payment) { score += 15; reasons.push('A "prize" that asks you to pay first = classic advance-fee scam.'); }
+    // Name the scam type and attach the exact advice for it.
+    var cls = classifyScam(hitCats);
+    if (cls) {
+      score += cls.bonus;
+      reasons.unshift('🔎 This looks like ' + cls.name + '.');
+      todo = cls.todo;
+    }
 
     // Any links inside the message get checked too, and the worst one counts.
     var urls = extractUrls(text), worst = null;
@@ -189,7 +303,9 @@
     }
 
     if (score === 0) reasons.push('No common scam signs found — but no message tool is perfect. If it involves money or a code, be careful.');
-    return { type: 'message', score: score, level: levelFromScore(score), reasons: reasons };
+    var out = { type: 'message', score: score, level: levelFromScore(score), reasons: reasons };
+    if (todo) out.todo = todo;
+    return out;
   }
 
   // ---- Phone analysis (offline is limited — honest about it) --------------

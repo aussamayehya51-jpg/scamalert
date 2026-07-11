@@ -89,7 +89,9 @@
   footer{text-align:center;color:#54688a;font-size:11.5px;margin-top:22px;line-height:1.7}
   footer a{color:#7fb2e5;text-decoration:none}
 
-  /* QR scanner */
+  /* QR scanner + photo check */
+  .tworow{display:flex;gap:10px;margin-top:10px}
+  .tworow .btn-scan{margin-top:0;flex:1}
   .btn-scan{width:100%;margin-top:10px;background:#0f2438;color:#8fd7ff;border:1px solid #23406a;padding:12px;font-size:14px}
   #cam{display:none;width:100%;border-radius:12px;margin-top:10px;border:1px solid #23406a;background:#000}
   #cam.on{display:block}
@@ -123,10 +125,15 @@
       <button class="btn-paste" id="pasteBtn" type="button">📋 Paste</button>
       <button class="btn-check" id="checkBtn" type="button">Check now</button>
     </div>
-    <button class="btn-scan" id="scanBtn" type="button">📷 Scan a QR code</button>
+    <div class="tworow">
+      <button class="btn-scan" id="scanBtn" type="button">📷 Scan a QR</button>
+      <button class="btn-scan" id="photoBtn" type="button">🖼️ Check a photo</button>
+    </div>
+    <input id="photoInput" type="file" accept="image/*" style="display:none" />
     <video id="cam" playsinline muted></video>
     <div class="scan-msg" id="scanMsg"></div>
-    <div class="hint">Layer 1 runs instantly &amp; privately on your phone. If it’s unsure, you can ask the online AI for a deeper look.</div>
+    <div class="scan-msg" id="photoMsg"></div>
+    <div class="hint">💡 <b>Tip:</b> in WhatsApp, SMS or anywhere — hold a message → <b>Share</b> → <b>ScamAlert</b>, and it checks it here. Everything runs privately on your phone.</div>
   </div>
 
   <div class="result" id="result">
@@ -408,6 +415,65 @@
       '.\n\nBe careful — don’t click links or send money/codes to strangers.\n\nCheck anything suspicious yourself with ScamAlert.';
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   };
+
+  // ---- Check a photo / screenshot (on-device OCR) -------------------------
+  // For a message you cannot copy — a screenshot, or a photo of a letter or
+  // poster. The reader (Tesseract) is fetched the first time only; after that
+  // it is cached and works offline. The IMAGE itself never leaves the phone —
+  // the words are read locally, then run through the same offline engine.
+  var photoBtn = document.getElementById('photoBtn');
+  var photoInput = document.getElementById('photoInput');
+  var photoMsg = document.getElementById('photoMsg');
+
+  function loadReader(){
+    return new Promise(function(resolve, reject){
+      if (window.Tesseract) return resolve();
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      s.onload = function(){ window.Tesseract ? resolve() : reject(new Error('reader')); };
+      s.onerror = function(){ reject(new Error('reader')); };
+      document.head.appendChild(s);
+    });
+  }
+  function pmsg(html){ photoMsg.className = 'scan-msg on'; photoMsg.innerHTML = html; }
+
+  photoBtn.onclick = function(){ photoMsg.className = 'scan-msg'; photoMsg.textContent = ''; photoInput.click(); };
+  photoInput.onchange = function(){
+    var file = photoInput.files && photoInput.files[0];
+    if (!file) return;
+    pmsg('<span class="spin"></span> Reading the photo on your phone…');
+    loadReader().then(function(){
+      return window.Tesseract.recognize(file, 'eng+ara');
+    }).then(function(res){
+      photoInput.value = '';
+      var text = (res && res.data && res.data.text || '').replace(/\s+/g, ' ').trim();
+      if (!text || text.length < 3){ pmsg('Couldn’t read clear words from that image. Try a sharper screenshot, or type the message.'); return; }
+      photoMsg.className = 'scan-msg'; photoMsg.textContent = '';
+      inp.value = text;
+      doCheck();
+    }).catch(function(){
+      photoInput.value = '';
+      pmsg('Couldn’t load the photo reader (it needs internet the first time). You can still paste or type the message.');
+    });
+  };
+
+  // ---- Shared FROM another app (Share Target) -----------------------------
+  // Once installed, ScamAlert appears in the phone's Share menu. When the user
+  // shares a message/link from WhatsApp, SMS, the browser, anywhere — it lands
+  // here as ?text=…&url=…&title=…. We drop it in the box and check it at once.
+  // This is what makes it feel like it "catches" things from every app.
+  (function(){
+    var q;
+    try { q = new URLSearchParams(location.search); } catch(e){ return; }
+    var parts = [q.get('text'), q.get('url'), q.get('title')].filter(Boolean);
+    var shared = parts.join(' ').trim();
+    if (shared){
+      inp.value = shared;
+      // Clean the address bar so a refresh doesn't re-run the old shared text.
+      try { history.replaceState(null, '', location.pathname); } catch(e){}
+      doCheck();
+    }
+  })();
 })();
 
 // Offline support: cache the app shell so Layer 1 protects you with no internet.
