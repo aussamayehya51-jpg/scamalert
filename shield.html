@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a1220" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<title>Shield your phone — ScamAlert</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    background:radial-gradient(120% 80% at 50% 0%,#0e1b30 0%,#0a1220 55%,#070d18 100%);
+    color:#e6eef8;min-height:100vh;padding:18px 16px 46px}
+  .wrap{max-width:560px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .back{color:#8fd7ff;text-decoration:none;font-size:14px;font-weight:600}
+  .lang{background:#13233d;color:#8fd7ff;border:1px solid #23406a;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  h1{font-size:22px;margin:6px 0 6px;line-height:1.3}
+  .sub{color:#9fb4d1;font-size:13.5px;line-height:1.65;margin-bottom:18px}
+  .card{background:linear-gradient(160deg,#101f36,#0c1728);border:1px solid #1c2c48;border-radius:14px;padding:15px 17px;margin-bottom:13px}
+  .card .h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .card .ic{font-size:24px;flex:0 0 auto}
+  .card h2{font-size:15.5px;color:#eaf2ff}
+  .card .what{font-size:13.5px;color:#9fb4d1;line-height:1.6;margin-bottom:9px}
+  .card .do{font-size:14px;color:#cfe0f4;line-height:1.7;background:#08111f;border:1px solid #23406a;border-radius:10px;padding:10px 13px}
+  .card .do b{color:#00e6c0}
+  .card a.more{display:inline-block;margin-top:9px;color:#8fd7ff;text-decoration:none;font-size:13.5px;font-weight:700}
+  .note{color:#7f96b3;font-size:12.5px;line-height:1.6;margin-top:8px}
+  .intro{background:linear-gradient(160deg,#0e2a44,#0a1220);border:1px solid #1c2c48;border-radius:14px;padding:14px 16px;margin-bottom:16px}
+  .intro p{font-size:13.5px;color:#cfe0f4;line-height:1.65}
+  .intro .good{color:#57e0b4;font-weight:700}
+  footer{text-align:center;color:#54688a;font-size:11.5px;margin-top:22px;line-height:1.8}
+  [dir="rtl"] .card .h{flex-direction:row-reverse}
+  [dir="rtl"] .card,[dir="rtl"] .intro{text-align:right}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html" id="back">← Back to check</a>
+    <button class="lang" id="langBtn" type="button">العربية</button>
+  </div>
+
+  <h1 id="title"></h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="intro"><p id="introBody"></p></div>
+
+  <div id="cards"></div>
+
+  <footer>ScamAlert · OUS Software · Powered by Claude 🤖<br><span id="footNote"></span></footer>
+</div>
+
+<script>
+(function(){
+  var D = {
+    en: {
+      dir:'ltr', lang:'en', btn:'العربية', back:'← Back to check',
+      title:'🛡️ Shield your phone',
+      sub:'Free protections that are already in your phone — switched off by default, and most people never hear about them. Turn them on once. They cost nothing.',
+      introBody:'ScamAlert doesn’t run any of these — they’re your phone’s own settings, or free public tools. We just show you where they are. <span class="good">Nothing about you leaves your phone.</span> Each one is a wall; together they are strong.',
+      footNote:'Turn on what you can. Every wall you add, the scammer must beat.',
+      cards:[
+        { ic:'🔒', title:'Lock your WhatsApp (2-step PIN)',
+          what:'Stops a thief from stealing your WhatsApp number — even if they trick you into giving a code. This is the strongest single thing you can do.',
+          do:'Open <b>WhatsApp → Settings → Account → Two-step verification → Turn on</b>, and set a 6-digit PIN you’ll remember. Add your email too, for recovery.' },
+        { ic:'📵', title:'Silence unknown callers',
+          what:'Scam and foreign call-back numbers (like a call from a country you don’t know) won’t even ring. Real callers can leave a message.',
+          do:'In <b>WhatsApp → Settings → Privacy → Calls → Silence unknown callers</b>. On <b>iPhone</b>: Settings → Apps → Phone → Silence Unknown Callers. On <b>Android</b>: your Phone app → Settings → look for “Spam and Call Screen”.' },
+        { ic:'🙈', title:'Hide from strangers',
+          what:'This is how scammers found you for the “hello” messages. Lock down who can add you to groups and see your number, and the spam can’t reach you.',
+          do:'In <b>WhatsApp → Settings → Privacy → Groups → My Contacts</b>. In <b>Telegram → Settings → Privacy and Security → Phone Number → Nobody</b>, and “Groups” → My Contacts.' },
+        { ic:'✅', title:'Turn on login approval (2FA)',
+          what:'Even if a scammer gets your password, they still can’t get into your account without a second approval on your phone.',
+          do:'In each important app (Facebook, Instagram, Google/Gmail, your bank), open its <b>Security settings</b> and turn on <b>Two-factor authentication / Login approvals</b>.' },
+        { ic:'🔗', title:'Block scam links phone-wide',
+          what:'One phone setting that makes your phone refuse to open links to known scam websites — automatically, in every app.',
+          do:'', more:'linkshield.html', moreLabel:'Open the step-by-step guide →' },
+        { ic:'🚫', title:'Report a scammer the right way',
+          what:'Reporting gets scam accounts frozen (it’s why some of them show “account frozen”). It protects the next person too.',
+          do:'In <b>WhatsApp</b>: open the chat → tap the name at the top → scroll down → <b>Report</b> (and Block). In <b>Telegram</b>: open the chat → ⋮ → Report. In Lebanon, cybercrime can be reported to the ISF on <b>1787</b>.' }
+      ]
+    },
+    ar: {
+      dir:'rtl', lang:'ar', btn:'English', back:'→ العودة للفحص',
+      title:'🛡️ حصّن هاتفك',
+      sub:'حمايات مجانية موجودة أصلاً في هاتفك — مغلقة افتراضياً، ومعظم الناس لا يعرفون بوجودها. فعّلها مرة واحدة. لا تكلّف شيئاً.',
+      introBody:'ScamAlert لا يشغّل أياً منها — هي إعدادات هاتفك نفسه أو أدوات عامة مجانية. نحن فقط نريك أين هي. <span class="good">لا يغادر أي شيء عنك هاتفك.</span> كل واحدة جدار، ومعاً تصبح قوية.',
+      footNote:'فعّل ما تستطيع. كل جدار تضيفه، على المحتال أن يتخطاه.',
+      cards:[
+        { ic:'🔒', title:'اقفل واتسابك (رمز بخطوتين)',
+          what:'يمنع اللص من سرقة رقم واتسابك — حتى لو خدعك وأخذ منك رمزاً. هذا أقوى إجراء واحد يمكنك فعله.',
+          do:'افتح <b>واتساب ← الإعدادات ← الحساب ← التحقق بخطوتين ← تفعيل</b>، وضع رقماً سرياً من ٦ خانات تتذكّره. أضف بريدك الإلكتروني أيضاً للاسترجاع.' },
+        { ic:'📵', title:'إسكات المتصلين المجهولين',
+          what:'أرقام الاحتيال والاتصالات الأجنبية (مثل اتصال من بلد لا تعرفه) لن ترنّ أصلاً. المتصل الحقيقي يمكنه ترك رسالة.',
+          do:'في <b>واتساب ← الإعدادات ← الخصوصية ← المكالمات ← إسكات المتصلين المجهولين</b>. على <b>آيفون</b>: الإعدادات ← الهاتف ← إسكات المتصلين المجهولين. على <b>أندرويد</b>: تطبيق الهاتف ← الإعدادات ← ابحث عن «الرسائل المزعجة / فحص المكالمات».' },
+        { ic:'🙈', title:'اختفِ عن الغرباء',
+          what:'هكذا وجدك المحتالون لرسائل «مرحبا». تحكّم بمن يستطيع إضافتك إلى مجموعات ورؤية رقمك، فلا يصل إليك الإزعاج.',
+          do:'في <b>واتساب ← الإعدادات ← الخصوصية ← المجموعات ← جهات اتصالي</b>. في <b>تلغرام ← الإعدادات ← الخصوصية والأمان ← رقم الهاتف ← لا أحد</b>، و«المجموعات» ← جهات اتصالي.' },
+        { ic:'✅', title:'فعّل تأكيد الدخول (خطوتان)',
+          what:'حتى لو حصل المحتال على كلمة سرّك، لا يستطيع الدخول إلى حسابك بدون تأكيد ثانٍ على هاتفك.',
+          do:'في كل تطبيق مهم (فيسبوك، إنستغرام، جوجل/جيميل، بنكك)، افتح <b>إعدادات الأمان</b> وفعّل <b>المصادقة الثنائية / تأكيد تسجيل الدخول</b>.' },
+        { ic:'🔗', title:'احجب روابط الاحتيال على هاتفك كله',
+          what:'إعداد واحد يجعل هاتفك يرفض فتح الروابط إلى مواقع احتيال معروفة — تلقائياً، في كل التطبيقات.',
+          do:'', more:'linkshield.html', moreLabel:'افتح الدليل خطوة بخطوة ←' },
+        { ic:'🚫', title:'بلّغ عن المحتال بالطريقة الصحيحة',
+          what:'التبليغ يؤدي إلى تجميد حسابات المحتالين (لذلك يظهر بعضها «حساب مجمّد»). ويحمي الشخص التالي أيضاً.',
+          do:'في <b>واتساب</b>: افتح المحادثة ← اضغط الاسم في الأعلى ← انزل للأسفل ← <b>إبلاغ</b> (وحظر). في <b>تلغرام</b>: افتح المحادثة ← ⋮ ← إبلاغ. في لبنان، يمكن التبليغ عن الجرائم الإلكترونية لدى قوى الأمن على <b>1787</b>.' }
+      ]
+    }
+  };
+
+  function render(code){
+    var d = D[code];
+    document.documentElement.setAttribute('dir', d.dir);
+    document.documentElement.setAttribute('lang', d.lang);
+    document.getElementById('langBtn').textContent = d.btn;
+    document.getElementById('back').textContent = d.back;
+    document.getElementById('title').textContent = d.title;
+    document.getElementById('sub').textContent = d.sub;
+    document.getElementById('introBody').innerHTML = d.introBody;
+    document.getElementById('footNote').textContent = d.footNote;
+    document.getElementById('cards').innerHTML = d.cards.map(function(c){
+      var doHtml = c.do ? '<div class="do">'+c.do+'</div>' : '';
+      var moreHtml = c.more ? '<a class="more" href="'+c.more+'">'+c.moreLabel+'</a>' : '';
+      return '<div class="card"><div class="h"><span class="ic">'+c.ic+'</span><h2>'+c.title+'</h2></div>'
+        + '<div class="what">'+c.what+'</div>' + doHtml + moreHtml + '</div>';
+    }).join('');
+    try { localStorage.setItem('sa_shield_lang', code); } catch(e){}
+  }
+
+  var start='en';
+  try { start = localStorage.getItem('sa_shield_lang') || localStorage.getItem('sa_learn_lang') || 'en'; } catch(e){}
+  render(D[start] ? start : 'en');
+  document.getElementById('langBtn').onclick = function(){
+    render(document.documentElement.getAttribute('lang')==='ar' ? 'en' : 'ar');
+  };
+})();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>
