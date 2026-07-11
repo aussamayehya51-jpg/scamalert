@@ -45,8 +45,10 @@
   .row{display:flex;gap:10px;margin-top:12px}
   button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-weight:700;transition:transform .06s,filter .15s}
   button:active{transform:translateY(1px)}
-  .btn-paste{flex:0 0 auto;background:#13233d;color:#8fd7ff;border:1px solid #23406a;padding:0 16px;font-size:14px}
-  .btn-check{flex:1;background:linear-gradient(90deg,#00d6a4,#00b4d8);color:#04121a;font-size:16px;padding:14px}
+  .btn-paste{flex:1;background:#13233d;color:#8fd7ff;border:1px solid #23406a;padding:12px 10px;font-size:14px;font-weight:700}
+  .btn-check{width:100%;margin-top:10px;background:linear-gradient(90deg,#00d6a4,#00b4d8);color:#04121a;font-size:16px;padding:14px}
+  .sharetip{display:none;margin-top:9px;font-size:12.5px;color:#8fd7ff;line-height:1.6;background:#0f2438;border:1px solid #23406a;border-radius:10px;padding:10px 12px}
+  .sharetip b{color:#fff}
   .btn-check:hover{filter:brightness(1.06)}
 
   .hint{color:#6f86a4;font-size:12px;margin:12px 2px 0;text-align:center;line-height:1.6}
@@ -123,8 +125,10 @@
     <textarea id="inp" placeholder="e.g.  Congratulations! You won $5000, click http://claim-now.xyz to receive it…"></textarea>
     <div class="row">
       <button class="btn-paste" id="pasteBtn" type="button">📋 Paste</button>
-      <button class="btn-check" id="checkBtn" type="button">Check now</button>
+      <button class="btn-paste" id="shareTipBtn" type="button">📲 Share</button>
     </div>
+    <div class="sharetip" id="shareTipMsg"></div>
+    <button class="btn-check" id="checkBtn" type="button">Check now</button>
     <div class="tworow">
       <button class="btn-scan" id="scanBtn" type="button">📷 Scan a QR</button>
       <button class="btn-scan" id="photoBtn" type="button">🖼️ Check a photo</button>
@@ -230,6 +234,15 @@
         if (txt){ inp.value = txt; doCheck(); }
       }).catch(function(){ inp.focus(); });
     } else { inp.focus(); }
+  };
+
+  // "Share" — the OS does the actual sharing INTO the app (from any app's Share
+  // menu), so this button can't pull a message in itself; it teaches the flow.
+  document.getElementById('shareTipBtn').onclick = function(){
+    var m = document.getElementById('shareTipMsg');
+    if (m.style.display === 'block'){ m.style.display = 'none'; return; }
+    m.style.display = 'block';
+    m.innerHTML = 'To check a message from another app: open it (like <b>WhatsApp</b>), <b>hold the message</b> → tap <b>Share</b> → choose <b>ScamAlert</b>. It opens here already checked. <br><span style="color:#9fb4d1">(First, install ScamAlert to your home screen so it appears in the Share menu.)</span>';
   };
 
   // Layer 2 — online AI second opinion (best-effort; graceful if server absent)
