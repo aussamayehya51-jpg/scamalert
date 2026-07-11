@@ -10,10 +10,10 @@
 // Paths are RELATIVE on purpose. The app is served both from a domain root
 // (a real server) and from a subfolder (GitHub Pages: /scamalert/). Absolute
 // "/index.html" paths would silently point at the wrong place on Pages.
-const CACHE = 'scamalert-v7';
+const CACHE = 'scamalert-v8';
 const ASSETS = [
   './', './index.html', './scamEngine.js', './manifest.webmanifest',
-  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './learn.html'
+  './icon-192.png', './icon-512.png', './apple-touch-icon.png', './learn.html', './linkshield.html'
 ];
 
 self.addEventListener('install', (e) => {

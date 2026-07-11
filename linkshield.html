@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a1220" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<title>Block scam links on your whole phone — ScamAlert</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    background:radial-gradient(120% 80% at 50% 0%,#0e1b30 0%,#0a1220 55%,#070d18 100%);
+    color:#e6eef8;min-height:100vh;padding:18px 16px 46px}
+  .wrap{max-width:560px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .back{color:#8fd7ff;text-decoration:none;font-size:14px;font-weight:600}
+  .lang{background:#13233d;color:#8fd7ff;border:1px solid #23406a;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  h1{font-size:22px;margin:6px 0 6px;line-height:1.3}
+  .sub{color:#9fb4d1;font-size:13.5px;line-height:1.65;margin-bottom:16px}
+  .card{background:linear-gradient(160deg,#101f36,#0c1728);border:1px solid #1c2c48;border-radius:14px;padding:16px 18px;margin-bottom:14px}
+  .card h2{font-size:15.5px;color:#8fd7ff;margin-bottom:9px}
+  .card p{font-size:14px;color:#cfe0f4;line-height:1.65;margin-bottom:7px}
+  .good{color:#57e0b4;font-weight:700}
+  .step{display:flex;gap:13px;align-items:flex-start;margin-bottom:14px}
+  .n{flex:0 0 auto;width:32px;height:32px;border-radius:999px;background:linear-gradient(90deg,#00d6a4,#00b4d8);color:#04121a;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .step .t{font-size:15px;color:#eaf2ff;padding-top:3px;line-height:1.55}
+  .step .t b{color:#fff}
+  .typebox{background:#08111f;border:2px dashed #00d6a4;border-radius:12px;padding:15px;text-align:center;margin:4px 0}
+  .typebox .lbl{font-size:12px;color:#7f96b3;margin-bottom:5px}
+  .typebox .val{font-size:23px;font-weight:800;letter-spacing:.5px;color:#00e6c0;font-family:Consolas,monospace}
+  .warn{background:linear-gradient(160deg,#2a2109,#1e1808);border:1px solid #ffb020;border-radius:14px;padding:15px 18px;margin-bottom:14px}
+  .warn h2{color:#ffcf6b;font-size:15.5px;margin-bottom:8px}
+  .warn p{font-size:14px;color:#ffe9bf;line-height:1.65;margin-bottom:6px}
+  footer{text-align:center;color:#54688a;font-size:11.5px;margin-top:22px;line-height:1.8}
+  [dir="rtl"] .step{text-align:right}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html" id="back">← Back to check</a>
+    <button class="lang" id="langBtn" type="button">العربية</button>
+  </div>
+
+  <h1 id="title"></h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="card">
+    <h2 id="whatTitle"></h2>
+    <p id="whatBody"></p>
+    <p id="whoBody"></p>
+  </div>
+
+  <div class="card">
+    <h2 id="stepsTitle"></h2>
+    <div id="steps"></div>
+    <div class="typebox">
+      <div class="lbl" id="typeLbl"></div>
+      <div class="val">dns.quad9.net</div>
+    </div>
+    <div id="stepsAfter" style="margin-top:14px"></div>
+  </div>
+
+  <div class="warn">
+    <h2 id="honestTitle"></h2>
+    <p id="honestDoes"></p>
+    <p id="honestNot"></p>
+    <p id="honestWalls" style="margin-top:6px"></p>
+  </div>
+
+  <div class="card">
+    <h2 id="offTitle"></h2>
+    <p id="offBody"></p>
+  </div>
+
+  <footer>ScamAlert · OUS Software · Powered by Claude 🤖<br><span id="footNote"></span></footer>
+</div>
+
+<script>
+(function(){
+  var D = {
+    en: {
+      dir:'ltr', lang:'en', btn:'العربية', back:'← Back to check',
+      title:'🛡️ Block scam links on your whole phone',
+      sub:'An optional extra wall. Turn on one setting and your phone will automatically refuse to open links that lead to known scam websites — in every app. Free, and it takes about six taps.',
+      whatTitle:'💧 What this is',
+      whatBody:'This is an always-on filter for <b>links</b>. Once it is on, if you ever tap a link to a <span class="good">known scam or phishing website</span>, your phone simply will not open it. Automatically, in WhatsApp, the browser, everywhere.',
+      whoBody:'It uses <b>Quad9</b>, a free Swiss non-profit built to block dangerous websites. It keeps <span class="good">no record of you</span>. <b>ScamAlert does not run it and cannot see your browsing</b> — you switch it on in your own phone, and nothing about you leaves your phone.',
+      stepsTitle:'👉 Do this once (about 6 taps)',
+      steps:[
+        'Open your phone’s <b>Settings</b> (the ⚙️ icon).',
+        'At the top, tap <b>search 🔍</b> and type <b>Private DNS</b>, then tap the result. <span style="font-size:12.5px;color:#9fb4d1">(Often also under Settings → Connection &amp; sharing → Private DNS.)</span>',
+        'Choose <b>"Private DNS provider hostname"</b>.',
+        'In the box, type this exactly — no spaces, all small letters:'
+      ],
+      typeLbl:'Type this in the box:',
+      stepsAfter:[
+        'Tap <b>Save</b> (or the ✓).',
+        '<b>Done.</b> Your phone now filters scam links by itself — in every app. You never touch it again. ✅'
+      ],
+      honestTitle:'⭐ Honest — what it does and does NOT',
+      honestDoes:'<b>It catches:</b> links to websites already known to be scams. A big, silent, always-on wall.',
+      honestNot:'<b>It does NOT catch:</b> a brand-new scam link nobody has reported yet, or a sweet-talking message with no link at all. Those still need your eyes — and ScamAlert when you are unsure.',
+      honestWalls:'Think of it as <b>one more wall</b>, not the only wall.',
+      offTitle:'↩️ To turn it off later',
+      offBody:'Go back to the same place (Settings → Private DNS) and choose <b>"Off"</b> or <b>"Automatic"</b>. That’s all.',
+      footNote:'Your phone, your protection — nothing about you leaves it.'
+    },
+    ar: {
+      dir:'rtl', lang:'ar', btn:'English', back:'→ العودة للفحص',
+      title:'🛡️ احجب روابط الاحتيال على هاتفك كله',
+      sub:'جدار إضافي اختياري. فعّل إعداداً واحداً وسيرفض هاتفك تلقائياً فتح الروابط التي تؤدي إلى مواقع احتيال معروفة — في كل التطبيقات. مجاني، ويأخذ نحو ست نقرات.',
+      whatTitle:'💧 ما هذا',
+      whatBody:'هذا مرشّح دائم التشغيل لل<b>روابط</b>. بمجرد تفعيله، إذا نقرت يوماً على رابط يؤدي إلى <span class="good">موقع احتيال أو تصيّد معروف</span>، لن يفتحه هاتفك ببساطة. تلقائياً، في واتساب والمتصفح وكل مكان.',
+      whoBody:'يعتمد على <b>Quad9</b>، مؤسسة سويسرية غير ربحية ومجانية مهمتها حجب المواقع الخطيرة. لا تحتفظ <span class="good">بأي سجل عنك</span>. <b>ScamAlert لا يشغّله ولا يستطيع رؤية تصفّحك</b> — أنت تفعّله في هاتفك، ولا يغادر أي شيء عنك هاتفك.',
+      stepsTitle:'👉 افعل هذا مرة واحدة (نحو ٦ نقرات)',
+      steps:[
+        'افتح <b>الإعدادات</b> في هاتفك (أيقونة ⚙️).',
+        'في الأعلى اضغط <b>بحث 🔍</b> واكتب <b>Private DNS</b> ثم اضغط النتيجة. <span style="font-size:12.5px;color:#9fb4d1">(غالباً تجدها أيضاً في الإعدادات ← الاتصال والمشاركة ← Private DNS.)</span>',
+        'اختر <b>"Private DNS provider hostname"</b> (اسم مزوّد).',
+        'في الخانة، اكتب هذا تماماً — بلا مسافات وبأحرف صغيرة:'
+      ],
+      typeLbl:'اكتب هذا في الخانة:',
+      stepsAfter:[
+        'اضغط <b>حفظ</b> (أو ✓).',
+        '<b>تم.</b> صار هاتفك يرشّح روابط الاحتيال بنفسه — في كل التطبيقات. لن تلمسه مرة أخرى. ✅'
+      ],
+      honestTitle:'⭐ بصراحة — ماذا يفعل وماذا لا يفعل',
+      honestDoes:'<b>يكشف:</b> الروابط إلى مواقع معروفة أنها احتيال. جدار كبير صامت دائم.',
+      honestNot:'<b>لا يكشف:</b> رابطاً جديداً لم يبلّغ عنه أحد بعد، أو رسالة معسولة بلا رابط أصلاً. هذه تحتاج عينيك — وScamAlert عند الشك.',
+      honestWalls:'اعتبره <b>جداراً إضافياً</b>، لا الجدار الوحيد.',
+      offTitle:'↩️ لإيقافه لاحقاً',
+      offBody:'ارجع إلى المكان نفسه (الإعدادات ← Private DNS) واختر <b>"إيقاف"</b> أو <b>"تلقائي"</b>. هذا كل شيء.',
+      footNote:'هاتفك، حمايتك — لا يغادر أي شيء عنك.'
+    }
+  };
+
+  function render(code){
+    var d = D[code];
+    document.documentElement.setAttribute('dir', d.dir);
+    document.documentElement.setAttribute('lang', d.lang);
+    document.getElementById('langBtn').textContent = d.btn;
+    document.getElementById('back').textContent = d.back;
+    document.getElementById('title').textContent = d.title;
+    document.getElementById('sub').innerHTML = d.sub;
+    document.getElementById('whatTitle').textContent = d.whatTitle;
+    document.getElementById('whatBody').innerHTML = d.whatBody;
+    document.getElementById('whoBody').innerHTML = d.whoBody;
+    document.getElementById('stepsTitle').textContent = d.stepsTitle;
+    document.getElementById('typeLbl').textContent = d.typeLbl;
+    document.getElementById('honestTitle').textContent = d.honestTitle;
+    document.getElementById('honestDoes').innerHTML = d.honestDoes;
+    document.getElementById('honestNot').innerHTML = d.honestNot;
+    document.getElementById('honestWalls').innerHTML = d.honestWalls;
+    document.getElementById('offTitle').textContent = d.offTitle;
+    document.getElementById('offBody').innerHTML = d.offBody;
+    document.getElementById('footNote').textContent = d.footNote;
+
+    document.getElementById('steps').innerHTML = d.steps.map(function(s,i){
+      return '<div class="step"><div class="n">'+(i+1)+'</div><div class="t">'+s+'</div></div>';
+    }).join('');
+    document.getElementById('stepsAfter').innerHTML = d.stepsAfter.map(function(s,i){
+      return '<div class="step"><div class="n">'+(i+5)+'</div><div class="t">'+s+'</div></div>';
+    }).join('');
+    try { localStorage.setItem('sa_shield_lang', code); } catch(e){}
+  }
+
+  var start='en';
+  try { start = localStorage.getItem('sa_shield_lang') || localStorage.getItem('sa_learn_lang') || 'en'; } catch(e){}
+  render(D[start] ? start : 'en');
+  document.getElementById('langBtn').onclick = function(){
+    render(document.documentElement.getAttribute('lang')==='ar' ? 'en' : 'ar');
+  };
+})();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>
