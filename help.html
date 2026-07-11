@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a1220" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<title>Help — how to use ScamAlert</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+    background:radial-gradient(120% 80% at 50% 0%,#0e1b30 0%,#0a1220 55%,#070d18 100%);
+    color:#e6eef8;min-height:100vh;padding:18px 16px 46px}
+  .wrap{max-width:560px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .back{color:#8fd7ff;text-decoration:none;font-size:14px;font-weight:600}
+  .lang{background:#13233d;color:#8fd7ff;border:1px solid #23406a;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  h1{font-size:22px;margin:6px 0 6px}
+  .sub{color:#9fb4d1;font-size:13.5px;line-height:1.65;margin-bottom:16px}
+  .q{background:#13233d;border:1px solid #23406a;border-radius:12px;padding:9px 12px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .q input{flex:1;min-width:140px;background:#08111f;border:1px solid #23406a;border-radius:8px;color:#eaf2ff;padding:9px 11px;font-size:14px;font-family:inherit}
+  .card{background:linear-gradient(160deg,#101f36,#0c1728);border:1px solid #1c2c48;border-radius:14px;padding:15px 17px;margin-bottom:12px}
+  .card h2{font-size:15.5px;color:#8fd7ff;margin-bottom:8px;display:flex;gap:9px;align-items:center}
+  .card p{font-size:14px;color:#cfe0f4;line-height:1.7;margin-bottom:6px}
+  .card p b{color:#fff}
+  .pill{display:inline-block;font-size:12px;font-weight:800;padding:2px 9px;border-radius:999px;margin-inline-end:5px}
+  .red{background:#3a0e16;color:#ff8a97;border:1px solid #ff4a5e}
+  .amber{background:#33280b;color:#ffcf6b;border:1px solid #ffb020}
+  .green{background:#0c2c24;color:#57e0b4;border:1px solid #17b98a}
+  .none{color:#7f96b3;text-align:center;padding:14px;font-size:13.5px}
+  footer{text-align:center;color:#54688a;font-size:11.5px;margin-top:22px;line-height:1.8}
+  [dir="rtl"] .card,[dir="rtl"] .sub{text-align:right}
+  [dir="rtl"] .card h2{flex-direction:row-reverse}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html" id="back">← Back to check</a>
+    <button class="lang" id="langBtn" type="button">العربية</button>
+  </div>
+
+  <h1 id="title"></h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="q"><span>🔎</span><input id="search" type="text" /></div>
+
+  <div id="cards"></div>
+  <div class="none" id="noneMsg" style="display:none"></div>
+
+  <footer>ScamAlert · OUS Software · Powered by Claude 🤖<br><span id="footNote"></span></footer>
+</div>
+
+<script>
+(function(){
+  var D = {
+    en: {
+      dir:'ltr', lang:'en', btn:'العربية', back:'← Back to check', searchPh:'Search help…',
+      title:'❓ How to use ScamAlert',
+      sub:'A short, simple guide. Type in the search box to find an answer fast.',
+      footNote:'No account. Nothing about you leaves your phone.',
+      none:'No match. Try another word — or ask Claude from the “Shield your phone” page.',
+      cards:[
+        { k:'what is scamalert about purpose', h:['🛡️','What is ScamAlert?'],
+          b:'ScamAlert checks anything you are not sure about — a message, a link, or a phone number — and tells you if it looks like a scam. It is <b>free</b>, needs <b>no account</b>, and works <b>right on your phone</b>. Nothing you check is sent anywhere, unless you choose the online AI.' },
+        { k:'check message paste type how', h:['✍️','Check a message or link'],
+          b:'Paste or type the message (or link, or number) into the box and tap <b>Check now</b>. You get an instant answer. Tap <b>📋 Paste</b> to drop in whatever you last copied.' },
+        { k:'share from whatsapp any app share target', h:['📲','Check from WhatsApp / any app'],
+          b:'The easiest way: in WhatsApp, SMS, anywhere — hold the message → tap <b>Share</b> → choose <b>ScamAlert</b>. It opens already checked. (This works after you install ScamAlert to your home screen.)' },
+        { k:'photo screenshot picture image ocr', h:['🖼️','Check a photo or screenshot'],
+          b:'For a message you cannot copy: tap <b>🖼️ Check a photo</b> and pick a screenshot or take a picture. ScamAlert reads the words on your phone and checks them. The photo never leaves your phone.' },
+        { k:'qr code scan camera', h:['📷','Scan a QR code'],
+          b:'Tap <b>📷 Scan a QR</b> and point the camera at the QR code (on a poster, a payment sticker, anywhere). If it hides a bad link, ScamAlert catches it.' },
+        { k:'colors red amber green meaning result verdict', h:['🚦','What the colours mean'],
+          b:'<span class="pill red">RED</span> Very likely a scam — do not click, pay, or reply.<br><span class="pill amber">AMBER</span> Be careful — suspicious, check before you trust it.<br><span class="pill green">GREEN</span> No obvious scam signs — but stay careful; no tool is perfect.' },
+        { k:'ai second opinion online deep check', h:['🤖','The AI “second opinion”'],
+          b:'If you want a closer look, tap <b>Get a second opinion from the AI</b>. Only then, and only that one message, is sent to an AI for a deeper read. It is your choice, every time.' },
+        { k:'ask your own claude free account', h:['🧠','Ask your own Claude (free)'],
+          b:'Tap <b>Ask your own Claude</b> and it copies your message and opens Claude, so you get a full answer on your <b>own free account</b> — costs nothing, and no key or password is ever asked for.' },
+        { k:'install home screen add app pwa', h:['⬇️','Install it (add to home screen)'],
+          b:'Open the link in <b>Chrome</b> → menu (⋮) → <b>Add to Home screen</b> / <b>Install</b>. Now it is an app with the shield icon, it opens full-screen, and it works with no internet.' },
+        { k:'shield phone protections whatsapp calls 2fa', h:['🛡️','Shield your whole phone'],
+          b:'From the bottom of the app, open <b>“Shield your phone”</b> — free protections most people never turn on: lock WhatsApp with a PIN, silence unknown callers, hide from strangers, block scam links, and more.' },
+        { k:'privacy safe data private nothing leaves', h:['🔒','Is it private?'],
+          b:'Yes. The scam check runs on your phone. We keep <b>no account</b> and store <b>nothing</b>. The only time anything is sent is if <b>you</b> tap the online AI — and then only that one message.' },
+        { k:'scammed already happened lost money what to do', h:['🆘','If it already happened'],
+          b:'Act fast: call your bank and freeze the card. Change the password of anything connected, and turn on login approval. Keep the messages as proof — do not delete them. In Lebanon, report cybercrime to the ISF on <b>1787</b>. And tell your family so they are not next.' }
+      ]
+    },
+    ar: {
+      dir:'rtl', lang:'ar', btn:'English', back:'→ العودة للفحص', searchPh:'ابحث في المساعدة…',
+      title:'❓ كيف تستخدم ScamAlert',
+      sub:'دليل قصير وبسيط. اكتب في خانة البحث لتجد الجواب بسرعة.',
+      footNote:'بلا حساب. لا يغادر أي شيء عنك هاتفك.',
+      none:'لا نتيجة. جرّب كلمة أخرى — أو اسأل Claude من صفحة «حصّن هاتفك».',
+      cards:[
+        { k:'ما هو سكام اليرت الغرض', h:['🛡️','ما هو ScamAlert؟'],
+          b:'يفحص ScamAlert أي شيء لست متأكداً منه — رسالة أو رابط أو رقم هاتف — ويخبرك إن كان يبدو احتيالاً. <b>مجاني</b>، بلا <b>حساب</b>، ويعمل <b>على هاتفك مباشرة</b>. لا يُرسَل ما تفحصه إلى أي مكان، إلا إذا اخترت الذكاء الاصطناعي عبر الإنترنت.' },
+        { k:'فحص رسالة رابط لصق كتابة كيف', h:['✍️','افحص رسالة أو رابط'],
+          b:'الصق أو اكتب الرسالة (أو الرابط أو الرقم) في الخانة واضغط <b>افحص الآن</b>. يأتيك الجواب فوراً. اضغط <b>📋 لصق</b> لإدخال ما نسخته آخر مرة.' },
+        { k:'مشاركة واتساب أي تطبيق', h:['📲','افحص من واتساب / أي تطبيق'],
+          b:'أسهل طريقة: في واتساب أو الرسائل أو أي مكان — اضغط مطوّلاً على الرسالة ← <b>مشاركة</b> ← اختر <b>ScamAlert</b>. يفتح وقد فحصها. (يعمل بعد أن تثبّت ScamAlert على الشاشة الرئيسية.)' },
+        { k:'صورة لقطة شاشة قراءة', h:['🖼️','افحص صورة أو لقطة شاشة'],
+          b:'لرسالة لا تستطيع نسخها: اضغط <b>🖼️ افحص صورة</b> واختر لقطة شاشة أو التقط صورة. يقرأ ScamAlert الكلمات على هاتفك ويفحصها. الصورة لا تغادر هاتفك.' },
+        { k:'رمز qr مسح كاميرا', h:['📷','امسح رمز QR'],
+          b:'اضغط <b>📷 امسح QR</b> ووجّه الكاميرا نحو الرمز (على ملصق أو رمز دفع). إذا كان يخفي رابطاً خبيثاً، يكشفه ScamAlert.' },
+        { k:'ألوان أحمر أصفر أخضر معنى النتيجة', h:['🚦','ماذا تعني الألوان'],
+          b:'<span class="pill red">أحمر</span> احتيال على الأرجح — لا تنقر ولا تدفع ولا ترد.<br><span class="pill amber">أصفر</span> انتبه — مشبوه، تحقّق قبل أن تثق.<br><span class="pill green">أخضر</span> لا علامات احتيال واضحة — لكن ابقَ حذراً؛ لا أداة كاملة.' },
+        { k:'ذكاء اصطناعي رأي ثانٍ فحص عميق', h:['🤖','«الرأي الثاني» من الذكاء الاصطناعي'],
+          b:'إن أردت نظرة أعمق، اضغط <b>احصل على رأي ثانٍ من الذكاء الاصطناعي</b>. عندها فقط، وتلك الرسالة وحدها، تُرسَل إلى ذكاء اصطناعي لقراءة أدق. القرار لك في كل مرة.' },
+        { k:'اسأل claude مجاني حسابك', h:['🧠','اسأل Claude الخاص بك (مجاناً)'],
+          b:'اضغط <b>اسأل Claude الخاص بك</b> فينسخ رسالتك ويفتح Claude، لتحصل على جواب كامل على <b>حسابك المجاني</b> — بلا تكلفة، ولا يُطلب منك أي مفتاح أو كلمة سر.' },
+        { k:'تثبيت الشاشة الرئيسية إضافة تطبيق', h:['⬇️','ثبّته (أضفه للشاشة الرئيسية)'],
+          b:'افتح الرابط في <b>Chrome</b> ← القائمة (⋮) ← <b>إضافة إلى الشاشة الرئيسية</b> / <b>تثبيت</b>. صار تطبيقاً بأيقونة الدرع، يفتح بملء الشاشة، ويعمل بلا إنترنت.' },
+        { k:'حصّن الهاتف حمايات واتساب مكالمات', h:['🛡️','حصّن هاتفك كله'],
+          b:'من أسفل التطبيق افتح <b>«حصّن هاتفك»</b> — حمايات مجانية لا يفعّلها معظم الناس: قفل واتساب برمز، إسكات المتصلين المجهولين، الاختفاء عن الغرباء، حجب روابط الاحتيال، وغيرها.' },
+        { k:'خصوصية آمن بياناتي خاص', h:['🔒','هل هو خاص؟'],
+          b:'نعم. الفحص يجري على هاتفك. لا نحتفظ <b>بحساب</b> ولا نخزّن <b>شيئاً</b>. الشيء الوحيد الذي يُرسَل هو إن ضغطت <b>أنت</b> زر الذكاء الاصطناعي — وعندها تلك الرسالة وحدها.' },
+        { k:'تعرضت للاحتيال حصل خسرت مال ماذا أفعل', h:['🆘','إذا حصل الأمر بالفعل'],
+          b:'تصرّف بسرعة: اتصل بالبنك وجمّد البطاقة. غيّر كلمة السر لكل ما هو مرتبط وفعّل تأكيد الدخول. احتفظ بالرسائل كدليل — لا تحذفها. في لبنان بلّغ عن الجرائم الإلكترونية لدى قوى الأمن على <b>1787</b>. وأخبر عائلتك حتى لا يكونوا الضحية التالية.' }
+      ]
+    }
+  };
+
+  var CUR = 'en';
+  function draw(){
+    var d = D[CUR];
+    var term = (document.getElementById('search').value || '').trim().toLowerCase();
+    var list = d.cards.filter(function(c){
+      if (!term) return true;
+      return (c.k + ' ' + c.h[1] + ' ' + c.b).toLowerCase().indexOf(term) !== -1;
+    });
+    document.getElementById('cards').innerHTML = list.map(function(c){
+      return '<div class="card"><h2><span>'+c.h[0]+'</span>'+c.h[1]+'</h2><p>'+c.b+'</p></div>';
+    }).join('');
+    var none = document.getElementById('noneMsg');
+    none.style.display = list.length ? 'none' : 'block';
+    none.textContent = d.none;
+  }
+  function render(code){
+    CUR = code;
+    var d = D[code];
+    document.documentElement.setAttribute('dir', d.dir);
+    document.documentElement.setAttribute('lang', d.lang);
+    document.getElementById('langBtn').textContent = d.btn;
+    document.getElementById('back').textContent = d.back;
+    document.getElementById('title').textContent = d.title;
+    document.getElementById('sub').textContent = d.sub;
+    document.getElementById('search').placeholder = d.searchPh;
+    document.getElementById('footNote').textContent = d.footNote;
+    draw();
+    try { localStorage.setItem('sa_help_lang', code); } catch(e){}
+  }
+
+  document.getElementById('search').addEventListener('input', draw);
+  var start = 'en';
+  try { start = localStorage.getItem('sa_help_lang') || localStorage.getItem('sa_learn_lang') || 'en'; } catch(e){}
+  render(D[start] ? start : 'en');
+  document.getElementById('langBtn').onclick = function(){
+    render(document.documentElement.getAttribute('lang')==='ar' ? 'en' : 'ar');
+  };
+})();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>

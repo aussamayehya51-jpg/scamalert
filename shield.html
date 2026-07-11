@@ -27,6 +27,9 @@
   .card .do b{color:#00e6c0}
   .card a.more{display:inline-block;margin-top:9px;color:#8fd7ff;text-decoration:none;font-size:13.5px;font-weight:700}
   .note{color:#7f96b3;font-size:12.5px;line-height:1.6;margin-top:8px}
+  .askbtn{width:100%;margin-top:4px;background:linear-gradient(90deg,#8b5cf6,#00b4d8);color:#0a0616;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+  .askbtn:active{transform:translateY(1px)}
+  .coachmsg{display:none;margin-top:9px;font-size:13px;color:#c9b6ff;line-height:1.6}
   .intro{background:linear-gradient(160deg,#0e2a44,#0a1220);border:1px solid #1c2c48;border-radius:14px;padding:14px 16px;margin-bottom:16px}
   .intro p{font-size:13.5px;color:#cfe0f4;line-height:1.65}
   .intro .good{color:#57e0b4;font-weight:700}
@@ -61,7 +64,12 @@
       sub:'Free protections that are already in your phone — switched off by default, and most people never hear about them. Turn them on once. They cost nothing.',
       introBody:'ScamAlert doesn’t run any of these — they’re your phone’s own settings, or free public tools. We just show you where they are. <span class="good">Nothing about you leaves your phone.</span> Each one is a wall; together they are strong.',
       footNote:'Turn on what you can. Every wall you add, the scammer must beat.',
+      coachPrompt:'Hi Claude! Please be my personal safety helper. I want to protect myself and my family from scams and make my phone safer. I am not very technical — please guide me in simple steps, one thing at a time, and answer in the same language I write to you. Ask me what phone I use and what worries me most, then help me: spot scams, turn on the free protections in my phone (lock WhatsApp with a PIN, silence unknown callers, hide from strangers, block scam links, turn on login approval), and know what to do if something already happened. Be honest and patient with me.',
+      coachDone:'📋 Copied. Claude is opening — paste it there and press Enter. It runs on your own free account.',
       cards:[
+        { ask:true, ic:'🧠', title:'Ask Claude — your own free helper',
+          what:'Not sure how to do one of these, or worried about something not on this list? Ask Claude. It is free on your own account, patient, and answers in your language.',
+          btn:'🧠 Open Claude and ask' },
         { ic:'🔒', title:'Lock your WhatsApp (2-step PIN)',
           what:'Stops a thief from stealing your WhatsApp number — even if they trick you into giving a code. This is the strongest single thing you can do.',
           do:'Open <b>WhatsApp → Settings → Account → Two-step verification → Turn on</b>, and set a 6-digit PIN you’ll remember. Add your email too, for recovery.' },
@@ -88,7 +96,12 @@
       sub:'حمايات مجانية موجودة أصلاً في هاتفك — مغلقة افتراضياً، ومعظم الناس لا يعرفون بوجودها. فعّلها مرة واحدة. لا تكلّف شيئاً.',
       introBody:'ScamAlert لا يشغّل أياً منها — هي إعدادات هاتفك نفسه أو أدوات عامة مجانية. نحن فقط نريك أين هي. <span class="good">لا يغادر أي شيء عنك هاتفك.</span> كل واحدة جدار، ومعاً تصبح قوية.',
       footNote:'فعّل ما تستطيع. كل جدار تضيفه، على المحتال أن يتخطاه.',
+      coachPrompt:'مرحبا Claude! كن من فضلك مساعدي الشخصي للأمان. أريد حماية نفسي وعائلتي من الاحتيال وجعل هاتفي أكثر أماناً. أنا لست خبيراً بالتقنية — أرجوك أرشدني بخطوات بسيطة، خطوة واحدة كل مرة، وأجبني بنفس اللغة التي أكتب بها. اسألني عن نوع هاتفي وما الذي يقلقني أكثر، ثم ساعدني على: كشف الاحتيال، وتفعيل الحمايات المجانية في هاتفي (قفل واتساب برمز، إسكات المتصلين المجهولين، الاختفاء عن الغرباء، حجب روابط الاحتيال، تفعيل تأكيد الدخول)، ومعرفة ماذا أفعل إذا حصل شيء بالفعل. كن صادقاً وصبوراً معي.',
+      coachDone:'📋 تم النسخ. Claude يفتح الآن — الصقه هناك واضغط Enter. يعمل على حسابك المجاني الخاص.',
       cards:[
+        { ask:true, ic:'🧠', title:'اسأل Claude — مساعدك المجاني',
+          what:'لست متأكداً كيف تفعل واحدة من هذه، أو يقلقك شيء ليس في هذه القائمة؟ اسأل Claude. مجاني على حسابك الخاص، صبور، ويجيبك بلغتك.',
+          btn:'🧠 افتح Claude واسأل' },
         { ic:'🔒', title:'اقفل واتسابك (رمز بخطوتين)',
           what:'يمنع اللص من سرقة رقم واتسابك — حتى لو خدعك وأخذ منك رمزاً. هذا أقوى إجراء واحد يمكنك فعله.',
           do:'افتح <b>واتساب ← الإعدادات ← الحساب ← التحقق بخطوتين ← تفعيل</b>، وضع رقماً سرياً من ٦ خانات تتذكّره. أضف بريدك الإلكتروني أيضاً للاسترجاع.' },
@@ -121,12 +134,31 @@
     document.getElementById('sub').textContent = d.sub;
     document.getElementById('introBody').innerHTML = d.introBody;
     document.getElementById('footNote').textContent = d.footNote;
+    window.__coachPrompt = d.coachPrompt;
+    window.__coachDone = d.coachDone;
     document.getElementById('cards').innerHTML = d.cards.map(function(c){
+      if (c.ask){
+        return '<div class="card" style="border-color:#4a3d75;background:linear-gradient(160deg,#1b1a33,#12102a)">'
+          + '<div class="h"><span class="ic">'+c.ic+'</span><h2>'+c.title+'</h2></div>'
+          + '<div class="what">'+c.what+'</div>'
+          + '<button class="askbtn" id="coachBtn" type="button">'+c.btn+'</button>'
+          + '<div class="coachmsg" id="coachMsg"></div></div>';
+      }
       var doHtml = c.do ? '<div class="do">'+c.do+'</div>' : '';
       var moreHtml = c.more ? '<a class="more" href="'+c.more+'">'+c.moreLabel+'</a>' : '';
       return '<div class="card"><div class="h"><span class="ic">'+c.ic+'</span><h2>'+c.title+'</h2></div>'
         + '<div class="what">'+c.what+'</div>' + doHtml + moreHtml + '</div>';
     }).join('');
+
+    var cb = document.getElementById('coachBtn');
+    if (cb) cb.onclick = function(){
+      var win = window.open('https://claude.ai/new', '_blank');
+      var msg = document.getElementById('coachMsg');
+      function show(t){ msg.style.display='block'; msg.innerHTML = t + (win ? '' : ' <a href="https://claude.ai/new" target="_blank" style="color:#8fd7ff">Open Claude →</a>'); }
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(window.__coachPrompt).then(function(){ show(window.__coachDone); }).catch(function(){ show(window.__coachDone); });
+      } else { show(window.__coachDone); }
+    };
     try { localStorage.setItem('sa_shield_lang', code); } catch(e){}
   }
 
