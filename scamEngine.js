@@ -36,15 +36,22 @@
     credential: rx([
       'verify your (account|identity|card|number|phone|info)', 'confirm your (password|account|payment|identity|card)',
       'update your (payment|card|billing|account|info)', 'enter your (pin|password|otp|code|cvv)',
-      'share (the |your )?(code|otp|pin)', 'your otp', 'reactivate your account',
-      'login .{0,15}(verify|confirm|secure|unlock)',
-      // Asking for the OTP by reply — the #1 bank scam, phrased many ways.
-      '(reply|respond|text|send|give|tell|forward) (me |us |back )?.{0,18}(\\d-?digit )?(code|otp|pin|password|cvv)',
-      '\\b\\d-?digit (code|pin|otp|number|password)',
-      '(verification|confirmation|security|one[- ]?time) code',
-      'the (code|otp|pin) .{0,18}(we|i|that|just) .{0,8}sent',
-      'أدخل (الرمز|كلمة|الرقم السري)', 'رمز التحقق', 'أكّد (حسابك|هويتك)', 'حدّث (معلومات|بياناتك)',
-      '(أرسل|ابعت|زودني|اعطني) .{0,12}(الرمز|الكود|كلمة السر|رمز التحقق)', 'ما هو (الرمز|الكود)'
+      'reactivate your account', 'login .{0,15}(verify|confirm|secure|unlock)',
+      'أدخل (الرمز|كلمة|الرقم السري)', 'أكّد (حسابك|هويتك)', 'حدّث (معلومات|بياناتك)'
+    ]),
+    // Handing over the one-time code from your phone — near-always a scam (no
+    // real service asks you to reply with it). Kept separate from "enter your
+    // code" so we can escalate it hard. Tightened so it does NOT fire on a
+    // promo/discount/source "code" — it needs an OTP/PIN/verification code, a
+    // "digit code", or the "code we sent / code sent to your phone" shape.
+    otp_ask: rx([
+      '(reply|respond|text|forward|send|give|tell|share) .{0,18}(the )?(\\d-?digit |verification |security |one[- ]?time )?(otp|pin)\\b',
+      '(reply|respond|text|forward|send|give|tell|share) .{0,18}(the )?(\\d-?digit|verification|security|one[- ]?time) code',
+      '\\b\\d-?digit (code|pin|otp)',
+      '(the )?(\\d-?digit |verification |security |one[- ]?time )?code .{0,14}(we|i) .{0,6}(just )?sent',
+      'code .{0,10}(sent to|on) your (phone|number|mobile)',
+      '(whatsapp|sms|login|activation|verification|security|authentication|one[- ]?time|access) code',
+      'رمز التحقق', 'الرمز السري', 'الرمز الذي (وصلك|أرسلناه|بعتناه)', '(أرسل|ابعت|شارك|زودني) .{0,12}(رمز التحقق|الرمز السري|الكود)'
     ]),
     payment: rx([
       // Scammers phrase the ask a hundred ways: "send $50", "send me 50 dollars",
@@ -128,7 +135,8 @@
   var CAT_LABEL = {
     urgency: 'Pressure & urgency ("act now / your account will be closed")',
     prize: 'Prize / lottery bait ("you won")',
-    credential: 'Asking for your password, PIN or code',
+    credential: 'Asking you to verify / enter your account details',
+    otp_ask: 'Asking for the one-time code sent to your phone (OTP)',
     payment: 'Asking you to send money or a fee',
     impersonation: 'Pretending to be a bank / delivery / company',
     threat: 'Threat or blackmail',
@@ -140,7 +148,7 @@
     untraceable_pay: 'Asking to pay by gift card, crypto or wire (untraceable)'
   };
   var CAT_WEIGHT = {
-    urgency: 18, prize: 22, credential: 30, payment: 28, impersonation: 20, threat: 45,
+    urgency: 18, prize: 22, credential: 30, otp_ask: 34, payment: 28, impersonation: 20, threat: 45,
     investment: 26, task_job: 26, family_new_number: 26, refund_support: 26, authority: 16, untraceable_pay: 30
   };
 
@@ -233,6 +241,9 @@
     if (h.threat)
       return { name: 'a sextortion / blackmail scam', bonus: 0,
         todo: 'What to do: Do NOT pay and do NOT reply. This is a bulk bluff sent to thousands — they almost never have anything. Paying only marks you as easy. Block and delete.' };
+    if (h.otp_ask)
+      return { name: 'an OTP / bank-code phishing scam', bonus: 26,
+        todo: 'What to do: NEVER share the code from your phone — not with "the bank", "WhatsApp", "support", or anyone. That code is the key to your account; no real company ever asks you to send it. Delete and block.' };
     if (h.family_new_number)
       return { name: 'a "family / new number" scam', bonus: pay ? 22 : 0,
         todo: 'What to do: STOP — before you send anything, call the real person on their OLD number, or ask another relative. Scammers pose as your son, daughter or parent on a "new number" and invent an emergency. Real family will not mind you checking first.' };
@@ -258,7 +269,7 @@
       return { name: 'a fake-company / phishing message', bonus: 10,
         todo: 'What to do: Do not tap the link or reply. Reach the company yourself — their app, or a number you already have — never through a link inside the message.' };
     if (untr)
-      return { name: 'a scam (it wants an untraceable payment)', bonus: 10,
+      return { name: 'a scam (it wants an untraceable payment)', bonus: 30,
         todo: 'What to do: Anyone asking to be paid by gift card, crypto or Western Union is almost always a scammer — those cannot be traced or refunded. Do not pay.' };
     return null;
   }
