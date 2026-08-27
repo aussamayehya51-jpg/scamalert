@@ -10,12 +10,35 @@
 // Paths are RELATIVE on purpose. The app is served both from a domain root
 // (a real server) and from a subfolder (GitHub Pages: /scamalert/). Absolute
 // "/index.html" paths would silently point at the wrong place on Pages.
-const CACHE = 'scamalert-v11';
+//
+// ⚠️ AND: Cache Storage is per-ORIGIN, not per-app. On GitHub Pages this app
+// shares aussamayehya51-jpg.github.io with Coffee Money, Aroma Caffeh and
+// Credit Guardian. This file used to delete EVERY cache on that address that
+// was not its own, which wiped a working shop's offline copy — and theirs did
+// the same to ScamAlert. So everything below is scoped by name: we only ever
+// read from, and only ever delete, caches beginning with our own prefix.
+const PREFIX = 'scamalert-';
+const CACHE = PREFIX + 'v12';
+const HOME = './index.html';
 const ASSETS = [
-  './', './index.html', './scamEngine.js', './manifest.webmanifest',
+  './', HOME, './scamEngine.js', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   './learn.html', './linkshield.html', './shield.html', './help.html'
 ];
+
+// Our caches only — the new one first, then any older one we still have. That
+// fallback matters here more than anywhere: a phone that updates on one bar of
+// signal must not be left with no offline guard at all.
+async function mine(req, alt) {
+  const keys = (await caches.keys()).filter((k) => k.startsWith(PREFIX));
+  keys.sort((a, b) => (a === CACHE ? -1 : b === CACHE ? 1 : 0));
+  for (const k of keys) {
+    const c = await caches.open(k);
+    const hit = (await c.match(req)) || (alt ? await c.match(alt) : undefined);
+    if (hit) return hit;
+  }
+  return undefined;
+}
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -23,10 +46,16 @@ self.addEventListener('install', (e) => {
   );
 });
 
+// Retire OUR old versions only — never another app's — and only once the new
+// cache really holds the app shell.
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+    caches.open(CACHE)
+      .then((c) => c.match(HOME))
+      .then((ready) => (ready ? caches.keys() : []))
+      .then((keys) => Promise.all(
+        keys.filter((k) => k.startsWith(PREFIX) && k !== CACHE).map((k) => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
@@ -40,14 +69,14 @@ self.addEventListener('fetch', (e) => {
 
   // App shell: serve from cache first (instant + offline), update in background.
   e.respondWith(
-    caches.match(e.request).then((hit) => {
+    mine(e.request).then((hit) => {
       const net = fetch(e.request).then((resp) => {
         if (resp && resp.status === 200 && url.origin === location.origin) {
           const clone = resp.clone();
           caches.open(CACHE).then((c) => c.put(e.request, clone));
         }
         return resp;
-      }).catch(() => hit || caches.match('./index.html'));
+      }).catch(() => hit || mine(HOME));
       return hit || net;
     })
   );
